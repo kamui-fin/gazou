@@ -7,16 +7,15 @@ JPN_VERT_BEST_URL='https://github.com/tesseract-ocr/tessdata_best/raw/master/jpn
 TESSTRAIN_UTILS_URL='https://pastebin.com/raw/mz4EQqSJ'
 
 
-#git clone $TESSERACT_URL testtrainocr/tesseract
-#git clone $LANGDATA_LSTM_URL testtrainocr/langdata_lstm
+git clone $TESSERACT_URL trainocr/tesseract
+git clone $LANGDATA_LSTM_URL trainocr/langdata_lstm
 
 wget $JPN_BEST_URL -O trainocr/tesseract/tessdata/jpn.traineddata
 wget $JPN_VERT_BEST_URL -O trainocr/tesseract/tessdata/jpn_vert.traineddata
 wget $ENG_BEST_URL -O trainocr/tesseract/tessdata/eng.traineddata
-wget $TESSTRAIN_UTILS_URL -O trainocr/tesseract/src/training/tesstrain_utils.sh
 
-wget $WORDLIST_URL -O testtrainocr/langdata_lstm/jpn/jpn.wordlist
-wget $WORDLIST_URL -O testtrainocr/langdata_lstm/jpn_vert/jpn_vert.wordlist
+wget $WORDLIST_URL -O trainocr/langdata_lstm/jpn/jpn.wordlist
+wget $WORDLIST_URL -O trainocr/langdata_lstm/jpn_vert/jpn_vert.wordlist
 
 sudo apt install python3 python3-pip tesseract libtesseract-dev 
 pip3 install numpy pytesseract pyperclip opencv-python
