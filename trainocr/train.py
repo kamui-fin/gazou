@@ -5,9 +5,9 @@ from glob import glob
 import os
 import shutil
 
-FONTS_DIR="/home/kamui/Coding/Projects/ocr/trainocr/fonts"
-TESSDATA_DIR="/home/kamui/Coding/Projects/ocr/trainocr/tesseract/tessdata"
-LANG_DATA_DIR="/home/kamui/Coding/Projects/ocr/trainocr/langdata_lstm"
+FONTS_DIR="/root/Japanese-OCR/trainocr/fonts"
+TESSDATA_DIR="/root/Japanese-OCR/trainocr/tesseract/tessdata"
+LANG_DATA_DIR="/root/Japanese-OCR/trainocr/langdata_lstm"
 MAX_ITERATIONS=10
 TRAIN_LANG="jpn"
 
@@ -31,7 +31,8 @@ def combine_traineddata(checkpoint, old_traineddata, output_model):
     return check_call(f'lstmtraining --stop_training --continue_from "output/{checkpoint}_checkpoint" --traineddata "{old_traineddata}" --model_output "output/{checkpoint}.traineddata"', shell=True)
 
 def clean_trainfiles():
-    shutil.rmtree("train")
+    if (os.path.isdir("./train")):
+        shutil.rmtree("train")
     os.mkdir("train")
 
 def duplicate_font(fonts, font):
