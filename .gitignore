@@ -99,4 +99,6 @@ compile_commands.json
 build
 bin
 
-ocr_desktop_autogen
+scratch
+app/app_autogen
+.ccls-cache
