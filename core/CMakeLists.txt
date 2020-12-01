@@ -1,6 +1,6 @@
 project(core)
 
-find_package(OpenCV REQUIRED core imgproc imgcodecs)
+find_package(OpenCV REQUIRED core imgproc imgcodecs highgui)
 find_package(PkgConfig REQUIRED)
 
 include_directories(${OpenCV_INCLUDE_DIRS})
