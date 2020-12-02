@@ -1,20 +1,11 @@
-Add image processing
-    Extra border
-    Deskew
-    Smoothing
-    Noise removal
-    DPI Fix
-    + other stuff (look at the docs)
-
-Clean result text
 Add to tray
-Copy result to clipboard
-Implement cross platform screenshot
 Config gui
+Clean result text
+Implement cross platform screenshot
 Train model
-
 
 OPTIONAL
 ----------
 Auto detect speech bubble
+Maybe figure out some more img proc?
 

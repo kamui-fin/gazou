@@ -3,21 +3,7 @@
 OCR::OCR()
 {
     tess = new tesseract::TessBaseAPI();
-    tess->Init("/home/kamui/Coding/Projects/JP_OCR/core/data/models", "jpn_vert", tesseract::OEM_LSTM_ONLY);
-    tess->SetPageSegMode(tesseract::PSM_SINGLE_BLOCK_VERT_TEXT);
-    tess->SetVariable("tessedit_char_blacklist", "}><L");
-    tess->SetVariable("textord_debug_tabfind", "0");
-    tess->SetVariable("language_model_ngram_on", "0");
-    tess->SetVariable("tessedit_enable_dict_correction", "1");
-    tess->SetVariable("textord_really_old_xheight", "1");
-    tess->SetVariable("textord_force_make_prop_words", "F");
-    tess->SetVariable("edges_max_children_per_outline", "40");
-    tess->SetVariable("tosp_threshold_bias2", "1");
-    tess->SetVariable("classify_norm_adj_midpointt", "96");
-    tess->SetVariable("tessedit_class_miss_scale", "0.002");
-    tess->SetVariable("textord_initialx_ile", "1.0");
-    tess->SetVariable("preserve_interword_spaces", "1");
-    tess->SetVariable("user_defined_dpi", "300");
+    this->setLanguage();
 }
 
 OCR::~OCR()
@@ -55,9 +41,42 @@ void OCR::extractText(cv::Mat *img)
     result = tess->GetUTF8Text();
 }
 
-char *OCR::ocrImage(char const *path)
+char *OCR::ocrImage(char const *path, ORIENTATION orn)
 {
     cv::Mat img = processImage(path);
+    this->setLanguage(orn);
     extractText(&img);
     return result;
+}
+
+void OCR::setLanguage(ORIENTATION orn)
+{
+    const char *lang = orn ? "jpn_vert" : "jpn";
+    if (orn == VERTICAL)
+    {
+        tess->SetPageSegMode(tesseract::PSM_SINGLE_BLOCK_VERT_TEXT);
+    }
+    else
+    {
+        tess->SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
+    }
+
+    tess->Init("/home/kamui/Coding/Projects/JP_OCR/core/data/models", lang, tesseract::OEM_LSTM_ONLY);
+    this->setJapaneseParams();
+}
+void OCR::setJapaneseParams()
+{
+    tess->SetVariable("tessedit_char_blacklist", "}><L");
+    tess->SetVariable("textord_debug_tabfind", "0");
+    tess->SetVariable("language_model_ngram_on", "0");
+    tess->SetVariable("tessedit_enable_dict_correction", "1");
+    tess->SetVariable("textord_really_old_xheight", "1");
+    tess->SetVariable("textord_force_make_prop_words", "F");
+    tess->SetVariable("edges_max_children_per_outline", "40");
+    tess->SetVariable("tosp_threshold_bias2", "1");
+    tess->SetVariable("classify_norm_adj_midpointt", "96");
+    tess->SetVariable("tessedit_class_miss_scale", "0.002");
+    tess->SetVariable("textord_initialx_ile", "1.0");
+    tess->SetVariable("preserve_interword_spaces", "1");
+    tess->SetVariable("user_defined_dpi", "300");
 }
