@@ -1,12 +1,16 @@
-#include <iostream>
 #include <QApplication>
 #include <QDebug>
 #include <QHotkey>
 #include <QClipboard>
 #include <QSignalMapper>
+#include <QtWidgets>
+
 #include <bits/stdc++.h>
 #include <string.h>
+#include <iostream>
+
 #include "ocr.h"
+#include "configwindow.h"
 
 void copyToClipboard(char *text, QClipboard *cb)
 {
@@ -47,6 +51,8 @@ int main(int argc, char **argv)
     char const *horizontalHotkey = "alt+a";
     setupOCRHotkey(verticalHotkey, runOCR, VERTICAL);
     setupOCRHotkey(horizontalHotkey, runOCR, HORIZONTAL);
+
+    ConfigWindow w;
 
     return app.exec();
 }

@@ -7,8 +7,8 @@ set(CMAKE_AUTOUIC ON)
 if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
     endif()
-    
-add_executable(${PROJECT_NAME} src/main.cpp)
+
+add_executable(${PROJECT_NAME} src/main.cpp src/configwindow.cpp resources/resources.qrc)
 
 find_package(Qt5 COMPONENTS Widgets X11Extras REQUIRED)
 find_package(QHotkey CONFIG REQUIRED)
