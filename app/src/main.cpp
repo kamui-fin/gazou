@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QHotkey>
 #include <QClipboard>
+#include <QSignalMapper>
 #include <bits/stdc++.h>
 #include <string.h>
 #include "ocr.h"
@@ -12,17 +13,20 @@ void copyToClipboard(char *text, QClipboard *cb)
     cb->setText(text);
 }
 
-QHotkey *setupHotkey(char const *sequence, void callback())
+QHotkey *setupOCRHotkey(char const *sequence, void callback(ORIENTATION orn), ORIENTATION orn)
 {
     QHotkey *hotkey = new QHotkey(QKeySequence(sequence), true, qApp);
-    QObject::connect(hotkey, &QHotkey::activated, qApp,
-                     callback);
+    QSignalMapper *signalMapper = new QSignalMapper(qApp);
+    QObject::connect(hotkey, &QHotkey::activated, qApp, [=]() {
+        callback(orn);
+    });
     return hotkey;
 }
 
-void runOCR()
+void runOCR(ORIENTATION orn)
 {
     static OCR *ocr = new OCR();
+    static QClipboard *clipboard = QApplication::clipboard();
     // screenshot and save to temp.png
     const char *imagePath = "/home/kamui/Coding/Projects/JP_OCR/core/data/images/temp.png";
     const char *command = "maim -s -u ";
@@ -30,17 +34,19 @@ void runOCR()
     strC += imagePath;
     system(strC.c_str());
 
-    char *result = ocr->ocrImage(imagePath);
+    char *result = ocr->ocrImage(imagePath, orn);
     std::cout << result << std::endl;
+    clipboard->setText(result);
 }
 
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
-    QClipboard *clipboard = QApplication::clipboard();
 
     char const *verticalHotkey = "alt+q";
-    setupHotkey(verticalHotkey, runOCR);
+    char const *horizontalHotkey = "alt+a";
+    setupOCRHotkey(verticalHotkey, runOCR, VERTICAL);
+    setupOCRHotkey(horizontalHotkey, runOCR, HORIZONTAL);
 
     return app.exec();
 }
