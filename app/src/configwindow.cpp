@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+#include <QCloseEvent>
 #include "configwindow.h"
 
 ConfigWindow::ConfigWindow(QWidget *parent)
@@ -12,6 +13,8 @@ ConfigWindow::ConfigWindow(QWidget *parent)
     this->setWindowIcon(appIcon);
 
     this->trayIcon->show();
+
+    connect(trayIcon, &QSystemTrayIcon::activated, this, &ConfigWindow::iconActivated);
 }
 
 QMenu *ConfigWindow::createMenu()
@@ -23,4 +26,30 @@ QMenu *ConfigWindow::createMenu()
     menu->addAction(quitAction);
 
     return menu;
+}
+
+void ConfigWindow::closeEvent(QCloseEvent *event)
+{
+#ifdef Q_OS_MACOS
+    if (!event->spontaneous() || !isVisible())
+    {
+        return;
+    }
+#endif
+    if (trayIcon->isVisible())
+    {
+        hide();
+        event->ignore();
+    }
+}
+
+void ConfigWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    switch (reason)
+    {
+    case QSystemTrayIcon::Trigger:
+        show();
+        break;
+    default:;
+    }
 }
