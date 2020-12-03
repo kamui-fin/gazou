@@ -5,6 +5,20 @@
 ConfigWindow::ConfigWindow(QWidget *parent)
     : QMainWindow(parent), trayIcon(new QSystemTrayIcon(this))
 {
+
+    widget = new QWidget(this);
+    this->setCentralWidget(widget);
+
+    verticalKeybindLabel = new QLabel(tr("Vertical OCR"));
+    verticalKeybindButton = new QPushButton("Alt+Q", widget);
+    horizontalKeybindLabel = new QLabel(tr("Horizontal OCR"));
+    horizontalKeybindButton = new QPushButton("Alt+A", widget);
+    QGridLayout *mainLayout = new QGridLayout(widget);
+    mainLayout->addWidget(verticalKeybindLabel, 0, 0);
+    mainLayout->addWidget(verticalKeybindButton, 0, 1);
+    mainLayout->addWidget(horizontalKeybindLabel, 1, 0);
+    mainLayout->addWidget(horizontalKeybindButton, 1, 1);
+
     QMenu *menu = this->createMenu();
     this->trayIcon->setContextMenu(menu);
 
