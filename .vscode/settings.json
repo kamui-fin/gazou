@@ -67,7 +67,23 @@
         "valarray": "cpp",
         "variant": "cpp",
         "qsignalmapper": "cpp",
-        "qsystemtrayicon": "cpp"
+        "qsystemtrayicon": "cpp",
+        "any": "cpp",
+        "bitset": "cpp",
+        "cfenv": "cpp",
+        "charconv": "cpp",
+        "codecvt": "cpp",
+        "csetjmp": "cpp",
+        "csignal": "cpp",
+        "cuchar": "cpp",
+        "forward_list": "cpp",
+        "regex": "cpp",
+        "future": "cpp",
+        "numbers": "cpp",
+        "scoped_allocator": "cpp",
+        "shared_mutex": "cpp",
+        "span": "cpp",
+        "typeindex": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}/."
 }
