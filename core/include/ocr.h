@@ -1,5 +1,5 @@
 #include <tesseract/baseapi.h>
-#include <opencv2/opencv.hpp>
+#include <leptonica/allheaders.h>
 
 enum ORIENTATION
 {
@@ -18,8 +18,8 @@ private:
     tesseract::TessBaseAPI *tess;
     char *result;
 
-    cv::Mat processImage(char const *path);
-    void extractText(cv::Mat *img);
+    PIX *processImage(char const *path);
+    void extractText(PIX *img);
     void setLanguage(ORIENTATION orn = VERTICAL);
     void setJapaneseParams();
 };
