@@ -32,7 +32,7 @@ void runOCR(ORIENTATION orn)
     static OCR *ocr = new OCR();
     static QClipboard *clipboard = QApplication::clipboard();
     // screenshot and save to temp.png
-    const char *imagePath = "/home/kamui/Coding/Projects/JP_OCR/core/data/images/temp.png";
+    const char *imagePath = "core/data/images/temp.png";
     const char *command = "maim -s -u ";
     std::string strC = command;
     strC += imagePath;

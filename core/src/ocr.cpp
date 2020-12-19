@@ -1,6 +1,8 @@
 #include "ocr.h"
-#include "leptonica/allheaders.h"
-#include <iostream>
+#include <leptonica/allheaders.h>
+#include <algorithm>
+
+#define DEBUG
 
 OCR::OCR()
 {
@@ -27,7 +29,7 @@ PIX *OCR::processImage(char const *path)
   const int usmHalfwidth = 5;
   const float usmFract = 2.5f;
 
-  PIX *pixs = pixRead("/home/kamui/Coding/Projects/JP_OCR/core/data/images/temp.png");
+  PIX *pixs = pixRead(path);
 
   // Convert to grayscale
   pixs = pixConvertRGBToGray(pixs, 0.0, 0.0, 0.0);
@@ -41,7 +43,6 @@ PIX *OCR::processImage(char const *path)
                          L_SELECT_IF_EITHER, L_SELECT_IF_GT, nullptr);
 
   // Decide if image needs to be inverted or not
-
   float pixelAvg = pixAverageOnLine(pixs, 0, 0, pixs->w - 1, 0, 1);
   pixelAvg += pixAverageOnLine(pixs, 0, pixs->h - 1, pixs->w - 1, pixs->h - 1, 1);
   pixelAvg += pixAverageOnLine(pixs, 0, 0, 0, pixs->h - 1, 1);
@@ -56,9 +57,9 @@ PIX *OCR::processImage(char const *path)
   // Add a border
   pixs = pixAddBlackOrWhiteBorder(pixs, 10, 10, 10, 10, L_GET_WHITE_VAL);
 
-  pixWrite(
-      "/home/kamui/Coding/Projects/JP_OCR/core/data/images/afterProcess.png", pixs, IFF_PNG);
-
+#ifdef DEBUG
+  pixWrite("core/data/images/afterProcess.png", pixs, IFF_PNG);
+#endif
   return pixs;
 }
 
@@ -73,6 +74,7 @@ char *OCR::ocrImage(char const *path, ORIENTATION orn)
   PIX *img = processImage(path);
   this->setLanguage(orn);
   extractText(img);
+  postProcessText();
   return result;
 }
 
@@ -88,7 +90,7 @@ void OCR::setLanguage(ORIENTATION orn)
     tess->SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
   }
 
-  tess->Init("/home/kamui/Coding/Projects/JP_OCR/core/data/models", lang,
+  tess->Init("core/data/models", lang,
              tesseract::OEM_LSTM_ONLY);
   this->setJapaneseParams();
 }
@@ -107,4 +109,21 @@ void OCR::setJapaneseParams()
   tess->SetVariable("textord_initialx_ile", "1.0");
   tess->SetVariable("preserve_interword_spaces", "1");
   tess->SetVariable("user_defined_dpi", "300");
+}
+
+void remove_spaces(char *s)
+{
+  const char *d = s;
+  do
+  {
+    while (*d == ' ')
+    {
+      ++d;
+    }
+  } while (*s++ = *d++);
+}
+
+void OCR::postProcessText()
+{
+  remove_spaces(result);
 }
