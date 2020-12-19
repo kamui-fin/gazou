@@ -1,13 +1,16 @@
 #include "ocr.h"
 #include <leptonica/allheaders.h>
+#include <string>
 #include <algorithm>
+#include <map>
+#include <iostream>
+#include <regex>
 
 #define DEBUG
 
 OCR::OCR()
 {
   tess = new tesseract::TessBaseAPI();
-  this->setLanguage();
 }
 
 OCR::~OCR()
@@ -74,7 +77,7 @@ char *OCR::ocrImage(char const *path, ORIENTATION orn)
   PIX *img = processImage(path);
   this->setLanguage(orn);
   extractText(img);
-  postProcessText();
+  // postProcessText();
   return result;
 }
 
@@ -90,6 +93,7 @@ void OCR::setLanguage(ORIENTATION orn)
     tess->SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
   }
 
+  orientation = orn;
   tess->Init("core/data/models", lang,
              tesseract::OEM_LSTM_ONLY);
   this->setJapaneseParams();
@@ -111,19 +115,21 @@ void OCR::setJapaneseParams()
   tess->SetVariable("user_defined_dpi", "300");
 }
 
-void remove_spaces(char *s)
-{
-  const char *d = s;
-  do
-  {
-    while (*d == ' ')
-    {
-      ++d;
-    }
-  } while (*s++ = *d++);
-}
+// std::map<std::string, std::string> REPLACE_CHARS_VERT = {
+//     {" ", ""},
+//     {"|", "ー"},
+// };
+// std::map<std::string, std::string> REPLACE_CHARS_HORIZONTAL = {};
 
-void OCR::postProcessText()
-{
-  remove_spaces(result);
-}
+// void OCR::postProcessText()
+// {
+//   std::string cleanedText = result;
+//   if (orientation == VERTICAL)
+//   {
+//     for (std::map<std::string, std::string>::iterator it = REPLACE_CHARS_VERT.begin(); it != REPLACE_CHARS_VERT.end(); it++)
+//     {
+//       cleanedText = std::regex_replace(cleanedText, std::regex(it->first), it->second.length() ? it->second : "");
+//     }
+//   }
+//   std::cout << cleanedText << std::endl;
+// }
