@@ -22,4 +22,5 @@ private:
     void extractText(PIX *img);
     void setLanguage(ORIENTATION orn = VERTICAL);
     void setJapaneseParams();
+    void postProcessText();
 };

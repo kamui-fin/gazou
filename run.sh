@@ -1,1 +1,0 @@
-cmake . && cmake --build build  --target all && build/app/app
