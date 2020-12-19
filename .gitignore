@@ -96,9 +96,5 @@ compile_commands.json
 *creator.user*
 
 *_qmlcache.qrc
-build
-bin
-
-scratch
 app/app_autogen
 .ccls-cache
