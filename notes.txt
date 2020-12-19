@@ -1,12 +1,7 @@
 TODO
 =======
-Config gui
 Clean result text
-Implement cross platform screenshot
+Complete the gui
 Train model
-
-(OPTIONAL)
-----------
-Auto detect speech bubble
-
-
+Implement cross platform screenshot
+Deploy properly

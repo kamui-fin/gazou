@@ -1,5 +1,6 @@
 #include <tesseract/baseapi.h>
 #include <leptonica/allheaders.h>
+#include <map>
 
 enum ORIENTATION
 {
@@ -16,6 +17,7 @@ public:
 
 private:
     tesseract::TessBaseAPI *tess;
+    ORIENTATION orientation;
     char *result;
 
     PIX *processImage(char const *path);
