@@ -19,10 +19,11 @@ private:
     tesseract::TessBaseAPI *tess;
     ORIENTATION orientation;
     char *result;
+    PIX *image;
 
     PIX *processImage(char const *path);
-    void extractText(PIX *img);
-    void setLanguage(ORIENTATION orn = VERTICAL);
+    void extractText();
+    void setLanguage(ORIENTATION orn);
     void setJapaneseParams();
     void postProcessText();
 };
