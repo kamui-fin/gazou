@@ -1,12 +1,15 @@
 #include "ocr.h"
 #include <leptonica/allheaders.h>
 #include <string>
-#include <algorithm>
 #include <map>
 #include <iostream>
-#include <regex>
 
 #define DEBUG
+
+void debug(std::string msg)
+{
+  std::cout << msg << std::endl;
+}
 
 OCR::OCR()
 {
@@ -18,6 +21,7 @@ OCR::~OCR()
   delete[] result;
   tess->End();
   delete tess;
+  pixDestroy(&image);
 }
 
 PIX *OCR::processImage(char const *path)
@@ -66,37 +70,42 @@ PIX *OCR::processImage(char const *path)
   return pixs;
 }
 
-void OCR::extractText(PIX *img)
+void OCR::extractText()
 {
-  tess->SetImage(img);
+  tess->SetImage(image);
   result = tess->GetUTF8Text();
 }
 
 char *OCR::ocrImage(char const *path, ORIENTATION orn)
 {
-  PIX *img = processImage(path);
-  this->setLanguage(orn);
-  extractText(img);
-  // postProcessText();
+  if (orn != orientation)
+  {
+    this->setLanguage(orn);
+  }
+
+  image = processImage(path);
+  extractText();
+  postProcessText();
   return result;
 }
 
 void OCR::setLanguage(ORIENTATION orn)
 {
   const char *lang = orn ? "jpn_vert" : "jpn";
+  tess->Init("core/data/models", lang,
+             tesseract::OEM_LSTM_ONLY);
+  this->setJapaneseParams();
+
   if (orn == VERTICAL)
   {
     tess->SetPageSegMode(tesseract::PSM_SINGLE_BLOCK_VERT_TEXT);
   }
-  else
+  else if (orn == HORIZONTAL)
   {
     tess->SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
   }
 
   orientation = orn;
-  tess->Init("core/data/models", lang,
-             tesseract::OEM_LSTM_ONLY);
-  this->setJapaneseParams();
 }
 void OCR::setJapaneseParams()
 {
@@ -115,21 +124,32 @@ void OCR::setJapaneseParams()
   tess->SetVariable("user_defined_dpi", "300");
 }
 
-// std::map<std::string, std::string> REPLACE_CHARS_VERT = {
-//     {" ", ""},
-//     {"|", "ー"},
-// };
-// std::map<std::string, std::string> REPLACE_CHARS_HORIZONTAL = {};
+std::map<std::string, std::string> REPLACE_CHARS_VERT = {
+    {" ", ""},
+    {"|", "ー"},
+};
+std::map<std::string, std::string> REPLACE_CHARS_HORIZONTAL = {};
 
-// void OCR::postProcessText()
-// {
-//   std::string cleanedText = result;
-//   if (orientation == VERTICAL)
-//   {
-//     for (std::map<std::string, std::string>::iterator it = REPLACE_CHARS_VERT.begin(); it != REPLACE_CHARS_VERT.end(); it++)
-//     {
-//       cleanedText = std::regex_replace(cleanedText, std::regex(it->first), it->second.length() ? it->second : "");
-//     }
-//   }
-//   std::cout << cleanedText << std::endl;
-// }
+void replaceAll(std::string &str, const std::string &from, const std::string &to)
+{
+  size_t start_pos = 0;
+  while ((start_pos = str.find(from, start_pos)) != std::string::npos)
+  {
+    str.replace(start_pos, from.length(), to);
+    start_pos += to.length();
+  }
+}
+
+void OCR::postProcessText()
+{
+  std::string cleanedText = result;
+  if (orientation == VERTICAL)
+  {
+    for (std::map<std::string, std::string>::iterator it = REPLACE_CHARS_VERT.begin(); it != REPLACE_CHARS_VERT.end(); it++)
+    {
+      replaceAll(cleanedText, it->first, it->second);
+    }
+  }
+
+  strcpy(result, cleanedText.c_str());
+}
