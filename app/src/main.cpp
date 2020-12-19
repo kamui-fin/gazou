@@ -11,6 +11,7 @@
 
 #include "ocr.h"
 #include "configwindow.h"
+#include "selectorwidget.h"
 
 void copyToClipboard(char *text, QClipboard *cb)
 {
@@ -30,10 +31,13 @@ QHotkey *setupOCRHotkey(char const *sequence, void callback(ORIENTATION orn), OR
 void runOCR(ORIENTATION orn)
 {
     static OCR *ocr = new OCR();
+    static SelectorWidget sw;
     static QClipboard *clipboard = QApplication::clipboard();
     // screenshot and save to temp.png
     const char *imagePath = "core/data/images/temp.png";
-    const char *command = "maim -s -u ";
+    // sw.exec();
+
+    const char *command = "sleep 0.2 ; scrot -s -z -o ";
     std::string strC = command;
     strC += imagePath;
     system(strC.c_str());
@@ -52,7 +56,7 @@ int main(int argc, char **argv)
     setupOCRHotkey(verticalHotkey, runOCR, VERTICAL);
     setupOCRHotkey(horizontalHotkey, runOCR, HORIZONTAL);
 
-    ConfigWindow w;
+    ConfigWindow cw;
 
     return app.exec();
 }

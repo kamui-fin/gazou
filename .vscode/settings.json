@@ -83,7 +83,8 @@
         "scoped_allocator": "cpp",
         "shared_mutex": "cpp",
         "span": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "qdialog": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}/."
 }
