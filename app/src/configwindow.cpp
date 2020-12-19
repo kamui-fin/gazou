@@ -32,7 +32,7 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 
     this->trayIcon->show();
 
-    connect(trayIcon, &QSystemTrayIcon::activated, this, &ConfigWindow::iconActivated);
+    // connect(trayIcon, &QSystemTrayIcon::activated, this, &ConfigWindow::iconActivated);
 }
 
 QMenu *ConfigWindow::createMenu()
