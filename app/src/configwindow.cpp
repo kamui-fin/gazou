@@ -13,11 +13,15 @@ ConfigWindow::ConfigWindow(QWidget *parent)
     verticalKeybindButton = new QPushButton("Alt+Q", widget);
     horizontalKeybindLabel = new QLabel(tr("Horizontal OCR"));
     horizontalKeybindButton = new QPushButton("Alt+A", widget);
+
+    verticalKeybindLabel->setStyleSheet("margin-right: 5px;");
+    horizontalKeybindLabel->setStyleSheet("margin-right: 8px;");
     QGridLayout *mainLayout = new QGridLayout(widget);
     mainLayout->addWidget(verticalKeybindLabel, 0, 0);
     mainLayout->addWidget(verticalKeybindButton, 0, 1);
     mainLayout->addWidget(horizontalKeybindLabel, 1, 0);
     mainLayout->addWidget(horizontalKeybindButton, 1, 1);
+    setFixedSize(sizeHint());
 
     QMenu *menu = this->createMenu();
     this->trayIcon->setContextMenu(menu);
