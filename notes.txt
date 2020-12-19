@@ -1,11 +1,12 @@
-Add to tray
+TODO
+=======
 Config gui
 Clean result text
 Implement cross platform screenshot
 Train model
 
-OPTIONAL
+(OPTIONAL)
 ----------
 Auto detect speech bubble
-Maybe figure out some more img proc?
+
 

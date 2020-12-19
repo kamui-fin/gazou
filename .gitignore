@@ -95,6 +95,7 @@ compile_commands.json
 # QtCreator local machine specific files for imported projects
 *creator.user*
 
+build/*
 *_qmlcache.qrc
 app/app_autogen
 .ccls-cache
