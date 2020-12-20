@@ -5,7 +5,8 @@
 enum ORIENTATION
 {
     HORIZONTAL,
-    VERTICAL
+    VERTICAL,
+    NONE,
 };
 
 class OCR
@@ -17,7 +18,7 @@ public:
 
 private:
     tesseract::TessBaseAPI *tess;
-    ORIENTATION orientation;
+    ORIENTATION orientation = NONE;
     char *result;
     PIX *image;
 
