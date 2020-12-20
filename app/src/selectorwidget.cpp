@@ -53,7 +53,7 @@ void SelectorWidget::paintEvent(QPaintEvent *)
     QPainterPath path;
     path.addRect(rect());
     path.addRect(selectedRect);
-    p.fillPath(path, QColor::fromRgb(255, 255, 255, 200));
+    p.fillPath(path, QColor::fromRgb(255, 255, 255, 50));
 
     p.setPen(Qt::red);
     p.drawRect(selectedRect);

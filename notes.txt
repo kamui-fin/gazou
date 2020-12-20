@@ -1,7 +1,8 @@
 TODO
 =======
-Clean result text
 Complete the gui
 Train model
+Clean result text
+
 Implement cross platform screenshot
 Deploy properly
