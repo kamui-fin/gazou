@@ -1,40 +1,53 @@
 #include <QApplication>
+#include <QGuiApplication>
 #include <QDesktopWidget>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QScreen>
 #include <iostream>
 #include <QPainterPath>
+#include <QWindow>
+#include <QDebug>
 
 #include "selectorwidget.h"
 
+QScreen *getActiveScreen()
+{
+    QPoint globalCursorPos = QCursor::pos();
+    QScreen *activeScreen = QGuiApplication::screenAt(globalCursorPos);
+    return activeScreen;
+}
+
 QPixmap grabScreenshot()
 {
-    QPixmap desktopPixmap = QPixmap(QApplication::desktop()->geometry().size());
+    QScreen *activeScreen = getActiveScreen();
+    QPixmap desktopPixmap = QPixmap(activeScreen->geometry().size());
     QPainter p(&desktopPixmap);
 
-    for (QScreen *screen : QApplication::screens())
-        p.drawPixmap(screen->geometry().topLeft(), screen->grabWindow(0));
+    p.drawPixmap(*(new QPoint(0, 0)), activeScreen->grabWindow(0));
 
     return desktopPixmap;
 }
 
 SelectorWidget::SelectorWidget(QWidget *parent) : QDialog(parent, Qt::FramelessWindowHint)
 {
+    QScreen *activeScreen = getActiveScreen();
     setAttribute(Qt::WA_TranslucentBackground);
-    setGeometry(QApplication::desktop()->geometry());
 
+    setGeometry(activeScreen->geometry());
     desktopPixmap = grabScreenshot();
 }
 
 void SelectorWidget::mousePressEvent(QMouseEvent *event)
 {
-    selectedRect.setTopLeft(event->globalPos());
+    QPoint *pnt = new QPoint(event->localPos().x(), event->localPos().y());
+    selectedRect.setTopLeft(*pnt);
 }
 
 void SelectorWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    selectedRect.setBottomRight(event->globalPos());
+    QPoint *pnt = new QPoint(event->localPos().x(), event->localPos().y());
+    selectedRect.setBottomRight(*pnt);
     update();
 }
 
