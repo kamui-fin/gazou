@@ -1,18 +1,35 @@
 #include <QCoreApplication>
 #include <QCloseEvent>
+#include <QDialog>
+#include <QMessageBox>
+#include <iostream>
+#include <QDebug>
 #include "configwindow.h"
+#include "keydialog.h"
 
-ConfigWindow::ConfigWindow(QWidget *parent)
+void setRegistered(std::vector<QHotkey *> hotkeys, bool registered)
+{
+    for (std::vector<QHotkey *>::iterator it = hotkeys.begin(); it != hotkeys.end(); it++)
+    {
+        (*it)->setRegistered(registered);
+    }
+}
+
+ConfigWindow::ConfigWindow(std::vector<QHotkey *> hotkeys, QWidget *parent)
     : QMainWindow(parent), trayIcon(new QSystemTrayIcon(this))
 {
 
+    this->hotkeys = hotkeys;
+    settings = new QSettings("JP OCR", "jpocr");
     widget = new QWidget(this);
     this->setCentralWidget(widget);
 
     verticalKeybindLabel = new QLabel(tr("Vertical OCR"));
-    verticalKeybindButton = new QPushButton("Alt+Q", widget);
     horizontalKeybindLabel = new QLabel(tr("Horizontal OCR"));
-    horizontalKeybindButton = new QPushButton("Alt+A", widget);
+    verticalKeybindButton = new QPushButton(settings->value("Hotkeys/verticalOCR", "Alt+A").toString(), widget);
+    verticalKeybindButton->setObjectName("VertBtn");
+    horizontalKeybindButton = new QPushButton(settings->value("Hotkeys/horizontalOCR", "Alt+D").toString(), widget);
+    horizontalKeybindButton->setObjectName("HorBtn");
 
     verticalKeybindLabel->setStyleSheet("margin-right: 5px;");
     horizontalKeybindLabel->setStyleSheet("margin-right: 8px;");
@@ -32,7 +49,10 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 
     this->trayIcon->show();
 
-    // connect(trayIcon, &QSystemTrayIcon::activated, this, &ConfigWindow::iconActivated);
+    connect(trayIcon, &QSystemTrayIcon::activated, this, &ConfigWindow::iconActivated);
+
+    connect(verticalKeybindButton, &QPushButton::clicked, this, &ConfigWindow::handleHotkeyButton);
+    connect(horizontalKeybindButton, &QPushButton::clicked, this, &ConfigWindow::handleHotkeyButton);
 }
 
 QMenu *ConfigWindow::createMenu()
@@ -70,4 +90,27 @@ void ConfigWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
         break;
     default:;
     }
+}
+
+void ConfigWindow::handleHotkeyButton()
+{
+    setRegistered(hotkeys, false);
+    KeyDialog setKeyDialog;
+    auto button = qobject_cast<QPushButton *>(sender());
+    if (setKeyDialog.exec() == QDialog::Accepted)
+    {
+        button->setText(setKeyDialog.getKeySeq());
+        QString val = "Hotkeys/";
+        if (button->objectName() == "HorBtn")
+        {
+            val.append("horizontalOCR");
+        }
+        else if (button->objectName() == "VertBtn")
+        {
+            val.append("verticalOCR");
+        }
+        settings->setValue(val, setKeyDialog.getKeySeq());
+        settings->sync();
+    }
+    setRegistered(hotkeys, true);
 }
