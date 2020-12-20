@@ -37,16 +37,11 @@ void runOCR(ORIENTATION orn)
     static QClipboard *clipboard = QApplication::clipboard();
     // screenshot and save to temp.png
     const char *imagePath = "core/data/images/temp.png";
-    // sw.exec();
+    sw.show();
 
-    const char *command = "sleep 0.2 ; scrot -s -z -f -o ";
-    std::string strC = command;
-    strC += imagePath;
-    system(strC.c_str());
-
-    char *result = ocr->ocrImage(imagePath, orn);
-    std::cout << result << std::endl;
-    clipboard->setText(result);
+    // char *result = ocr->ocrImage(imagePath, orn);
+    // std::cout << result << std::endl;
+    // clipboard->setText(result);
 }
 
 int main(int argc, char **argv)
@@ -63,7 +58,6 @@ int main(int argc, char **argv)
     std::vector<QHotkey *> hotkeys = {vKey, hKey};
 
     ConfigWindow *cw = new ConfigWindow(hotkeys);
-    cw->show();
 
     return app.exec();
 }
