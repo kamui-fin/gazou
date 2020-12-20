@@ -84,7 +84,8 @@
         "shared_mutex": "cpp",
         "span": "cpp",
         "typeindex": "cpp",
-        "qdialog": "cpp"
+        "qdialog": "cpp",
+        "qdialogbuttonbox": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}/."
 }

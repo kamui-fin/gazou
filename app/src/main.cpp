@@ -10,6 +10,7 @@
 #include <bits/stdc++.h>
 #include <string.h>
 #include <iostream>
+#include <vector>
 
 #include "ocr.h"
 #include "configwindow.h"
@@ -20,10 +21,9 @@ void copyToClipboard(char *text, QClipboard *cb)
     cb->setText(text);
 }
 
-QHotkey *setupOCRHotkey(char const *sequence, void callback(ORIENTATION orn), ORIENTATION orn)
+QHotkey *setupOCRHotkey(QString sequence, void callback(ORIENTATION orn), ORIENTATION orn)
 {
     QHotkey *hotkey = new QHotkey(QKeySequence(sequence), true, qApp);
-    QSignalMapper *signalMapper = new QSignalMapper(qApp);
     QObject::connect(hotkey, &QHotkey::activated, qApp, [=]() {
         callback(orn);
     });
@@ -39,7 +39,7 @@ void runOCR(ORIENTATION orn)
     const char *imagePath = "core/data/images/temp.png";
     // sw.exec();
 
-    const char *command = "sleep 0.2 ; scrot -s -z -o ";
+    const char *command = "sleep 0.2 ; scrot -s -z -f -o ";
     std::string strC = command;
     strC += imagePath;
     system(strC.c_str());
@@ -52,13 +52,18 @@ void runOCR(ORIENTATION orn)
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
+    QSettings settings("JP OCR", "jpocr");
 
-    char const *verticalHotkey = "alt+q";
-    char const *horizontalHotkey = "alt+a";
-    setupOCRHotkey(verticalHotkey, runOCR, VERTICAL);
-    setupOCRHotkey(horizontalHotkey, runOCR, HORIZONTAL);
+    QString verticalHotkey = settings.value("Hotkeys/verticalOCR", "Alt+A").toString();
+    QString horizontalHotkey = settings.value("Hotkeys/horizontalOCR", "Alt+D").toString();
 
-    ConfigWindow cw;
+    QHotkey *vKey = setupOCRHotkey(verticalHotkey, runOCR, VERTICAL);
+    QHotkey *hKey = setupOCRHotkey(horizontalHotkey, runOCR, HORIZONTAL);
+
+    std::vector<QHotkey *> hotkeys = {vKey, hKey};
+
+    ConfigWindow *cw = new ConfigWindow(hotkeys);
+    cw->show();
 
     return app.exec();
 }
