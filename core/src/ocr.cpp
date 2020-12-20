@@ -125,10 +125,14 @@ void OCR::setJapaneseParams()
 }
 
 std::map<std::string, std::string> REPLACE_CHARS_VERT = {
-    {" ", ""},
     {"|", "ー"},
 };
+
 std::map<std::string, std::string> REPLACE_CHARS_HORIZONTAL = {};
+
+std::map<std::string, std::string> REPLACE_CHARS_ALL = {
+    {" ", ""},
+};
 
 void replaceAll(std::string &str, const std::string &from, const std::string &to)
 {
@@ -143,12 +147,12 @@ void replaceAll(std::string &str, const std::string &from, const std::string &to
 void OCR::postProcessText()
 {
   std::string cleanedText = result;
-  if (orientation == VERTICAL)
+  std::map<std::string, std::string> *replaceTableForOrn = orientation ? &REPLACE_CHARS_VERT : &REPLACE_CHARS_HORIZONTAL;
+  std::map<std::string, std::string> replaceTable = {};
+  replaceTable.insert(replaceTableForOrn->begin(), replaceTableForOrn->end());
+  for (auto it = replaceTable.begin(); it != replaceTable.end(); it++)
   {
-    for (std::map<std::string, std::string>::iterator it = REPLACE_CHARS_VERT.begin(); it != REPLACE_CHARS_VERT.end(); it++)
-    {
-      replaceAll(cleanedText, it->first, it->second);
-    }
+    replaceAll(cleanedText, it->first, it->second);
   }
 
   strcpy(result, cleanedText.c_str());
