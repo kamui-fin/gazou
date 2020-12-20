@@ -85,7 +85,8 @@
         "span": "cpp",
         "typeindex": "cpp",
         "qdialog": "cpp",
-        "qdialogbuttonbox": "cpp"
+        "qdialogbuttonbox": "cpp",
+        "qpainterpath": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}/."
 }
