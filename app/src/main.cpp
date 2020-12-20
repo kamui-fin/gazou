@@ -3,6 +3,8 @@
 #include <QHotkey>
 #include <QClipboard>
 #include <QSignalMapper>
+#include <QObject>
+#include <QEventLoop>
 #include <QtWidgets>
 
 #include <bits/stdc++.h>
