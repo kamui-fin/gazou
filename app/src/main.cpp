@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QHotkey>
+#include <QObject>
 #include <QClipboard>
 #include <QSignalMapper>
 #include <QObject>
@@ -15,6 +16,7 @@
 #include "ocr.h"
 #include "configwindow.h"
 #include "selectorwidget.h"
+#include "utils.h"
 
 void copyToClipboard(char *text, QClipboard *cb)
 {
@@ -37,11 +39,11 @@ void runOCR(ORIENTATION orn)
     static QClipboard *clipboard = QApplication::clipboard();
     // screenshot and save to temp.png
     const char *imagePath = "core/data/images/temp.png";
-    sw.show();
+    sw.exec();
 
-    // char *result = ocr->ocrImage(imagePath, orn);
-    // std::cout << result << std::endl;
-    // clipboard->setText(result);
+    char *result = ocr->ocrImage(imagePath, orn);
+    std::cout << result << std::endl;
+    clipboard->setText(result);
 }
 
 int main(int argc, char **argv)
@@ -59,5 +61,6 @@ int main(int argc, char **argv)
 
     ConfigWindow *cw = new ConfigWindow(hotkeys);
 
+    app.setQuitOnLastWindowClosed(false);
     return app.exec();
 }
