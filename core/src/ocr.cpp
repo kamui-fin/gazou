@@ -4,8 +4,6 @@
 #include <map>
 #include <iostream>
 
-#define DEBUG
-
 void debug(std::string msg)
 {
   std::cout << msg << std::endl;

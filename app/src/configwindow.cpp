@@ -43,7 +43,7 @@ ConfigWindow::ConfigWindow(std::vector<QHotkey *> hotkeys, QWidget *parent)
     QMenu *menu = this->createMenu();
     this->trayIcon->setContextMenu(menu);
 
-    QIcon appIcon = QIcon(":/icons/tray.png");
+    QIcon appIcon = QIcon(":/tray.png");
     this->trayIcon->setIcon(appIcon);
     this->setWindowIcon(appIcon);
 
