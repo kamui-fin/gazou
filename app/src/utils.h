@@ -1,0 +1,3 @@
+#include <QScreen>
+
+QScreen *getActiveScreen();
