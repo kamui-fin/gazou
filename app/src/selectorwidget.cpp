@@ -10,13 +10,7 @@
 #include <QDebug>
 
 #include "selectorwidget.h"
-
-QScreen *getActiveScreen()
-{
-    QPoint globalCursorPos = QCursor::pos();
-    QScreen *activeScreen = QGuiApplication::screenAt(globalCursorPos);
-    return activeScreen;
-}
+#include "utils.h"
 
 QPixmap grabScreenshot()
 {
@@ -33,9 +27,10 @@ SelectorWidget::SelectorWidget(QWidget *parent) : QDialog(parent, Qt::FramelessW
 {
     QScreen *activeScreen = getActiveScreen();
     setAttribute(Qt::WA_TranslucentBackground);
+    setWindowFlags(Qt::BypassWindowManagerHint);
 
-    setGeometry(activeScreen->geometry());
     desktopPixmap = grabScreenshot();
+    setGeometry(activeScreen->geometry());
 }
 
 void SelectorWidget::mousePressEvent(QMouseEvent *event)
