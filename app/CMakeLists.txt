@@ -1,19 +1,12 @@
-project(app)
+project(jpocr)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-include(FetchContent)
-
 if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
-    endif()
-
-if (WIN32)
-  set(CMAKE_SHARED_LIBRARY_PREFIX "")
-endif ()
-
+endif()
 
 add_executable(${PROJECT_NAME} src/main.cpp 
                                src/configwindow.cpp
@@ -23,12 +16,13 @@ add_executable(${PROJECT_NAME} src/main.cpp
                                resources/resources.qrc
 )
 
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
-find_package(QHotkey CONFIG REQUIRED)
+find_package(Qt5 COMPONENTS Widgets X11Extras REQUIRED)
 
-if (UNIX)
-    find_package(Qt5 COMPONENTS X11Extras REQUIRED)
+find_package(QHotkey CONFIG)
+if (NOT QHotkey_FOUND)
+    add_subdirectory(third-party/QHotkey EXCLUDE_FROM_ALL)
 endif()
 
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets qhotkey core)
+target_link_libraries(${PROJECT_NAME} Qt5::Widgets qhotkey jpocr_core)
 
+install(TARGETS jpocr RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

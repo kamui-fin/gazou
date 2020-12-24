@@ -1,9 +1,4 @@
-project(core)
-
-find_package(PkgConfig REQUIRED)
-
-link_directories(${TESSERACT_LIBRARY_DIRS})
-link_directories(${LEPTONICA_LIBRARY_DIRS})
+project(jpocr_core)
 
 add_library(${PROJECT_NAME} src/ocr.cpp)
 
