@@ -5,7 +5,6 @@ set (CMAKE_CXX_STANDARD 11)
 
 include(GNUInstallDirs)
 
-
 add_subdirectory(app)
 add_subdirectory(core)
 
