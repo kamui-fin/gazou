@@ -111,6 +111,9 @@ void ConfigWindow::handleHotkeyButton()
         }
         settings->setValue(val, setKeyDialog.getKeySeq());
         settings->sync();
+
+        hotkeys.at(0)->setShortcut((QKeySequence)(settings->value("Hotkeys/verticalOCR", "Alt+A").toString()));
+        hotkeys.at(1)->setShortcut((QKeySequence)(settings->value("Hotkeys/horizontalOCR", "Alt+D").toString()));
     }
     setRegistered(hotkeys, true);
 }

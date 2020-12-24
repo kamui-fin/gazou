@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <iostream>
+#include <algorithm>
 
 OCR::OCR(char const* modelDir)
 {
@@ -80,7 +81,6 @@ char *OCR::ocrImage(char const *path, ORIENTATION orn)
 
   image = processImage(path);
   extractText();
-  postProcessText();
   return result;
 }
 
@@ -117,38 +117,4 @@ void OCR::setJapaneseParams()
   tess->SetVariable("textord_initialx_ile", "1.0");
   tess->SetVariable("preserve_interword_spaces", "1");
   tess->SetVariable("user_defined_dpi", "300");
-}
-
-std::map<std::string, std::string> REPLACE_CHARS_VERT = {
-    {"|", "ー"},
-};
-
-std::map<std::string, std::string> REPLACE_CHARS_HORIZONTAL = {};
-
-std::map<std::string, std::string> REPLACE_CHARS_ALL = {
-    {" ", ""},
-};
-
-void replaceAll(std::string &str, const std::string &from, const std::string &to)
-{
-  size_t start_pos = 0;
-  while ((start_pos = str.find(from, start_pos)) != std::string::npos)
-  {
-    str.replace(start_pos, from.length(), to);
-    start_pos += to.length();
-  }
-}
-
-void OCR::postProcessText()
-{
-  std::string cleanedText = result;
-  std::map<std::string, std::string> *replaceTableForOrn = orientation ? &REPLACE_CHARS_VERT : &REPLACE_CHARS_HORIZONTAL;
-  std::map<std::string, std::string> replaceTable = {};
-  replaceTable.insert(replaceTableForOrn->begin(), replaceTableForOrn->end());
-  for (auto it = replaceTable.begin(); it != replaceTable.end(); it++)
-  {
-    replaceAll(cleanedText, it->first, it->second);
-  }
-
-  strcpy(result, cleanedText.c_str());
 }

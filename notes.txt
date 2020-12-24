@@ -1,7 +1,0 @@
-TODO
-=======
-Clean result text
-Train model
-Config hot reloading
-
-Deploy properly

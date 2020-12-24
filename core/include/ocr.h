@@ -27,5 +27,4 @@ private:
     void extractText();
     void setLanguage(ORIENTATION orn);
     void setJapaneseParams();
-    void postProcessText();
 };
