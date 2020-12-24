@@ -12,13 +12,14 @@ enum ORIENTATION
 class OCR
 {
 public:
-    OCR();
+    OCR(char const *modelDir);
     ~OCR();
     char *ocrImage(char const *path, ORIENTATION orn);
 
 private:
     tesseract::TessBaseAPI *tess;
     ORIENTATION orientation = NONE;
+    char const *modelFolder;
     char *result;
     PIX *image;
 

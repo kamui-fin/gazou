@@ -49,7 +49,8 @@ void SelectorWidget::mouseMoveEvent(QMouseEvent *event)
 void SelectorWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     selectedPixmap = desktopPixmap.copy(selectedRect.normalized());
-    selectedPixmap.toImage().save("core/data/images/temp.png");
+    selectedPixmap.toImage().save("/tmp/tempImg.png");
+    selectedRect.setRect(0,0,0,0);
     accept();
 }
 
