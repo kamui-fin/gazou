@@ -72,6 +72,15 @@ void OCR::extractText()
   result = tess->GetUTF8Text();
 }
 
+void remove_spaces(char* s) {
+    const char* d = s;
+    do {
+        while (*d == ' ') {
+            ++d;
+        }
+    } while (*s++ = *d++);
+}
+
 char *OCR::ocrImage(char const *path, ORIENTATION orn)
 {
   if (orn != orientation)
@@ -81,6 +90,7 @@ char *OCR::ocrImage(char const *path, ORIENTATION orn)
 
   image = processImage(path);
   extractText();
+  remove_spaces(result);
   return result;
 }
 
@@ -118,3 +128,4 @@ void OCR::setJapaneseParams()
   tess->SetVariable("preserve_interword_spaces", "1");
   tess->SetVariable("user_defined_dpi", "300");
 }
+
