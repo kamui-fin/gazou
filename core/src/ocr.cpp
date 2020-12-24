@@ -4,14 +4,10 @@
 #include <map>
 #include <iostream>
 
-void debug(std::string msg)
-{
-  std::cout << msg << std::endl;
-}
-
-OCR::OCR()
+OCR::OCR(char const* modelDir)
 {
   tess = new tesseract::TessBaseAPI();
+  modelFolder = modelDir;
 }
 
 OCR::~OCR()
@@ -24,6 +20,7 @@ OCR::~OCR()
 
 PIX *OCR::processImage(char const *path)
 {
+
   float factor = 3.5f;
   const int otsuSX = 2000;
   const int otsuSY = 2000;
@@ -63,7 +60,7 @@ PIX *OCR::processImage(char const *path)
   pixs = pixAddBlackOrWhiteBorder(pixs, 10, 10, 10, 10, L_GET_WHITE_VAL);
 
 #ifdef DEBUG
-  pixWrite("core/data/images/afterProcess.png", pixs, IFF_PNG);
+  pixWrite("/tmp/tempImgDebug.png", pixs, IFF_PNG);
 #endif
   return pixs;
 }
@@ -90,7 +87,7 @@ char *OCR::ocrImage(char const *path, ORIENTATION orn)
 void OCR::setLanguage(ORIENTATION orn)
 {
   const char *lang = orn ? "jpn_vert" : "jpn";
-  tess->Init("core/data/models", lang,
+  tess->Init(modelFolder, lang,
              tesseract::OEM_LSTM_ONLY);
   this->setJapaneseParams();
 

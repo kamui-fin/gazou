@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QEventLoop>
 #include <QtWidgets>
+#include <QDir>
 
 #include <bits/stdc++.h>
 #include <string.h>
@@ -34,15 +35,16 @@ QHotkey *setupOCRHotkey(QString sequence, void callback(ORIENTATION orn), ORIENT
 
 void runOCR(ORIENTATION orn)
 {
-    static OCR *ocr = new OCR();
-    static SelectorWidget sw;
+    const char *imagePath = "/tmp/tempImg.png";
+    const char *modelPath = "/usr/local/share/JP_OCR/models";
+
+    static OCR *ocr = new OCR(modelPath);
     static QClipboard *clipboard = QApplication::clipboard();
-    // screenshot and save to temp.png
-    const char *imagePath = "core/data/images/temp.png";
+    SelectorWidget sw;
     sw.exec();
 
     char *result = ocr->ocrImage(imagePath, orn);
-    std::cout << result << std::endl;
+    qDebug() << result;
     clipboard->setText(result);
 }
 
