@@ -25,4 +25,4 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets qhotkey jpocr_core)
 
-install(TARGETS jpocr RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS jpocr RUNTIME DESTINATION bin)
