@@ -1,1 +1,1 @@
-# JP OCR
+# Gazou OCR 

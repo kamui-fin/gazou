@@ -36,7 +36,7 @@ QHotkey *setupOCRHotkey(QString sequence, void callback(ORIENTATION orn), ORIENT
 void runOCR(ORIENTATION orn)
 {
     const char *imagePath = "/tmp/tempImg.png";
-    const char *modelPath = "/usr/local/share/JP_OCR/models";
+    const char *modelPath = "/usr/local/share/gazou/models";
 
     static OCR *ocr = new OCR(modelPath);
     static QClipboard *clipboard = QApplication::clipboard();
@@ -51,7 +51,7 @@ void runOCR(ORIENTATION orn)
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
-    QSettings settings("JP OCR", "jpocr");
+    QSettings settings("gazou", "gazou");
 
     QString verticalHotkey = settings.value("Hotkeys/verticalOCR", "Alt+A").toString();
     QString horizontalHotkey = settings.value("Hotkeys/horizontalOCR", "Alt+D").toString();
