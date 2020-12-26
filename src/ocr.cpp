@@ -4,11 +4,11 @@
 #include <map>
 #include <iostream>
 #include <algorithm>
+#include "config.h"
 
-OCR::OCR(char const* modelDir)
+OCR::OCR()
 {
   tess = new tesseract::TessBaseAPI();
-  modelFolder = modelDir;
 }
 
 OCR::~OCR()
@@ -97,7 +97,7 @@ char *OCR::ocrImage(char const *path, ORIENTATION orn)
 void OCR::setLanguage(ORIENTATION orn)
 {
   const char *lang = orn ? "jpn_vert" : "jpn";
-  tess->Init(modelFolder, lang,
+  tess->Init(GAZOU_MODEL_FOLDER, lang,
              tesseract::OEM_LSTM_ONLY);
   this->setJapaneseParams();
 

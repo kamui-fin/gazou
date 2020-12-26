@@ -18,6 +18,7 @@
 #include "configwindow.h"
 #include "selectorwidget.h"
 #include "utils.h"
+#include "config.h"
 
 void copyToClipboard(char *text, QClipboard *cb)
 {
@@ -36,9 +37,8 @@ QHotkey *setupOCRHotkey(QString sequence, void callback(ORIENTATION orn), ORIENT
 void runOCR(ORIENTATION orn)
 {
     const char *imagePath = "/tmp/tempImg.png";
-    const char *modelPath = "/usr/local/share/gazou/models";
 
-    static OCR *ocr = new OCR(modelPath);
+    static OCR *ocr = new OCR();
     static QClipboard *clipboard = QApplication::clipboard();
     SelectorWidget sw;
     sw.exec();

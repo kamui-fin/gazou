@@ -7,9 +7,21 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+set(Gazou_MODEL_FOLDER ${CMAKE_INSTALL_PREFIX}/share/gazou/models)
+
 if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+  message(STATUS "Build type not specified: Using Release by default")
+endif()
+
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
+
+configure_file(src/config.h.in config.h)
+include_directories(${PROJECT_BINARY_DIR})
 
 add_executable(${PROJECT_NAME} src/main.cpp 
                                src/configwindow.cpp
@@ -19,6 +31,7 @@ add_executable(${PROJECT_NAME} src/main.cpp
                                src/ocr.cpp
                                resources/resources.qrc
 )
+
 
 find_package(PkgConfig)
 
