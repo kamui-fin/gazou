@@ -20,7 +20,7 @@ ConfigWindow::ConfigWindow(std::vector<QHotkey *> hotkeys, QWidget *parent)
 {
 
     this->hotkeys = hotkeys;
-    settings = new QSettings("JP OCR", "jpocr");
+    settings = new QSettings("gazou", "gazou");
     widget = new QWidget(this);
     this->setCentralWidget(widget);
 

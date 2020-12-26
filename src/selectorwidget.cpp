@@ -31,6 +31,7 @@ SelectorWidget::SelectorWidget(QWidget *parent) : QDialog(parent, Qt::FramelessW
 
     desktopPixmap = grabScreenshot();
     setGeometry(activeScreen->geometry());
+    this->setCursor(Qt::CrossCursor);
 }
 
 void SelectorWidget::mousePressEvent(QMouseEvent *event)
