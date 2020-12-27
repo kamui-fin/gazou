@@ -1,3 +1,7 @@
+#include <QString>
+#include <QDir>
+
+
 #include "ocr.h"
 #include "utils.h"
 #include "config.h"
@@ -15,7 +19,7 @@ OCR::~OCR()
   pixDestroy(&image);
 }
 
-PIX *OCR::processImage(char const *path)
+PIX *OCR::processImage(QString path)
 {
 
   float factor = 3.5f;
@@ -28,7 +32,9 @@ PIX *OCR::processImage(char const *path)
   const int usmHalfwidth = 5;
   const float usmFract = 2.5f;
 
-  PIX *pixs = pixRead(path);
+  QByteArray array = path.toUtf8();
+  const char* imageLocation = array.constData();
+  PIX *pixs = pixRead(imageLocation);
 
   // Convert to grayscale
   pixs = pixConvertRGBToGray(pixs, 0.0, 0.0, 0.0);
@@ -57,7 +63,12 @@ PIX *OCR::processImage(char const *path)
   pixs = pixAddBlackOrWhiteBorder(pixs, 10, 10, 10, 10, L_GET_WHITE_VAL);
 
 #ifdef DEBUG
-  pixWrite("/tmp/tempImgDebug.png", pixs, IFF_PNG);
+  QString tempImgDebug = QDir::tempPath().append(QDir::separator()).append("tempImgDebug.png");
+  QByteArray tempArrayDebug = tempImgDebug.toUtf8();
+  const char* imgDebugLocation = tempArrayDebug.constData();
+
+  pixWrite(imgDebugLocation, pixs, IFF_PNG);
+  qDebug() << tempImgDebug ;
 #endif
   return pixs;
 }
@@ -69,7 +80,7 @@ void OCR::extractText()
 }
 
 
-char *OCR::ocrImage(char const *path, ORIENTATION orn)
+char *OCR::ocrImage(QString path, ORIENTATION orn)
 {
   if (orn != orientation)
   {
