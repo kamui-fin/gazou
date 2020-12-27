@@ -7,7 +7,11 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-set(Gazou_MODEL_FOLDER ${CMAKE_INSTALL_PREFIX}/share/gazou/models)
+if (UNIX)
+  set(Gazou_MODEL_FOLDER ${CMAKE_INSTALL_PREFIX}/share/gazou/models)
+elseif(WIN32)
+  set(Gazou_MODEL_FOLDER ${CMAKE_INSTALLPREFIX}/models)
+endif()
 
 if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -50,5 +54,11 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets qhotkey tesseract lept)
 
-install(TARGETS gazou RUNTIME DESTINATION bin)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/models DESTINATION share/gazou)
+if (UNIX)
+  install(TARGETS gazou RUNTIME DESTINATION bin)
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/models DESTINATION share/gazou)
+elseif(WIN32)
+  # Creating portable build for windows
+  install(TARGETS gazou RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/models DESTINATION ${CMAKE_INSTALL_PREFIX})
+endif()
