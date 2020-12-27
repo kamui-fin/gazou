@@ -1,9 +1,6 @@
-#include <QDebug>
 #include <QKeyEvent>
 #include <QLayout>
 #include <QDialogButtonBox>
-#include <QRegularExpression>
-#include <iostream>
 #include "keydialog.h"
 
 KeyDialog::KeyDialog(QDialog *parent) : QDialog(parent)
@@ -18,7 +15,6 @@ KeyDialog::KeyDialog(QDialog *parent) : QDialog(parent)
     buttonBox->setStandardButtons(QDialogButtonBox::Cancel | QDialogButtonBox::Ok);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
-    // connect(buttonBox->button(QDialogButtonBox::Ok), &QDialogButtonBox::clicked, &KeyDialog::save);
     label->setText("Press a set of keys to begin");
     verticalLayout->addWidget(buttonBox);
     setLayout(verticalLayout);

@@ -1,7 +1,7 @@
-#include <QWidget>
 #include <QDialog>
+#include <QDialogButtonBox>
+#include <QLayout>
 #include <QLabel>
-#include <QPushButton>
 
 class KeyDialog : public QDialog
 {

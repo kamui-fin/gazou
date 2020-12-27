@@ -1,21 +1,23 @@
+#include <QLabel>
+#include <QPushButton>
+#include <QAction>
+#include <QLayout>
+#include <QMenu>
 #include <QCoreApplication>
 #include <QCloseEvent>
-#include <QDialog>
-#include <QMessageBox>
-#include <iostream>
-#include <QDebug>
+
 #include "configwindow.h"
 #include "keydialog.h"
 
-void setRegistered(std::vector<QHotkey *> hotkeys, bool registered)
+void setRegistered(std::map<std::string, QHotkey *> hotkeys, bool registered)
 {
-    for (std::vector<QHotkey *>::iterator it = hotkeys.begin(); it != hotkeys.end(); it++)
+    for (auto const& x : hotkeys)
     {
-        (*it)->setRegistered(registered);
+            (x.second)->setRegistered(registered);
     }
 }
 
-ConfigWindow::ConfigWindow(std::vector<QHotkey *> hotkeys, QWidget *parent)
+ConfigWindow::ConfigWindow(std::map<std::string, QHotkey *> hotkeys, QWidget *parent)
     : QMainWindow(parent), trayIcon(new QSystemTrayIcon(this))
 {
 
@@ -100,20 +102,14 @@ void ConfigWindow::handleHotkeyButton()
     if (setKeyDialog.exec() == QDialog::Accepted)
     {
         button->setText(setKeyDialog.getKeySeq());
-        QString val = "Hotkeys/";
-        if (button->objectName() == "HorBtn")
-        {
-            val.append("horizontalOCR");
-        }
-        else if (button->objectName() == "VertBtn")
-        {
-            val.append("verticalOCR");
-        }
-        settings->setValue(val, setKeyDialog.getKeySeq());
+        QString shortKeyName = button->objectName() == "HorBtn" ? "horizontalOCR" : "verticalOCR";
+        QString key = "Hotkeys/";
+        key.append(shortKeyName);
+        QString value = setKeyDialog.getKeySeq();
+        settings->setValue(key, value);
         settings->sync();
 
-        hotkeys.at(0)->setShortcut((QKeySequence)(settings->value("Hotkeys/verticalOCR", "Alt+A").toString()));
-        hotkeys.at(1)->setShortcut((QKeySequence)(settings->value("Hotkeys/horizontalOCR", "Alt+D").toString()));
+        hotkeys[shortKeyName.toStdString()]->setShortcut(value);
     }
     setRegistered(hotkeys, true);
 }
