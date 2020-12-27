@@ -2,6 +2,7 @@
 #include <QHotkey>
 #include <QObject>
 #include <QClipboard>
+#include <QDir>
 #include <vector>
 #include <map>
 
@@ -26,7 +27,7 @@ void runOCR(ORIENTATION orn)
     static OCR *ocr = new OCR();
     static QClipboard *clipboard = QApplication::clipboard();
 
-    const char *imagePath = "/tmp/tempImg.png";
+    QString imagePath = QDir::tempPath().append(QDir::separator()).append("tempImg.png");
 
     SelectorWidget sw;
     sw.exec();
