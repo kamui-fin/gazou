@@ -1,5 +1,7 @@
 #include <QCursor>
 #include <QGuiApplication>
+#include <QHotkey>
+#include <QClipboard>
 
 #include "utils.h"
 
@@ -18,4 +20,17 @@ void remove_spaces(char* s) {
             ++d;
         }
     } while (*s++ = *d++);
+}
+
+void setRegistered(std::map<std::string, QHotkey *> hotkeys, bool registered)
+{
+    for (auto const& x : hotkeys)
+    {
+            (x.second)->setRegistered(registered);
+    }
+}
+
+void copyToClipboard(char *text, QClipboard *cb)
+{
+    cb->setText(text);
 }

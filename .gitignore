@@ -98,3 +98,4 @@ compile_commands.json
 build/*
 *_qmlcache.qrc
 .ccls-cache
+.vscode/settings.json

@@ -32,7 +32,6 @@ add_executable(${PROJECT_NAME} src/main.cpp
                                resources/resources.qrc
 )
 
-
 find_package(PkgConfig)
 
 pkg_check_modules(TESSERACT REQUIRED tesseract>=4.1.1)
@@ -44,7 +43,7 @@ if (UNIX)
   find_package(Qt5X11Extras REQUIRED)
 endif()
 
-find_package(QHotkey CONFIG)
+find_package(QHotkey CONFIG QUIET)
 if (NOT QHotkey_FOUND)
     add_subdirectory(third-party/QHotkey EXCLUDE_FROM_ALL)
 endif()

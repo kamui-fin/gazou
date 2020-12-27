@@ -12,11 +12,6 @@
 #include "config.h"
 
 
-void copyToClipboard(char *text, QClipboard *cb)
-{
-    cb->setText(text);
-}
-
 QHotkey *setupOCRHotkey(QString sequence, void callback(ORIENTATION orn), ORIENTATION orn)
 {
     QHotkey *hotkey = new QHotkey(QKeySequence(sequence), true, qApp);
@@ -44,9 +39,11 @@ void runOCR(ORIENTATION orn)
     #endif
 }
 
+
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
+
     QSettings settings("gazou", "gazou");
 
     QString verticalHotkey = settings.value("Hotkeys/verticalOCR", "Alt+A").toString();
@@ -63,5 +60,7 @@ int main(int argc, char **argv)
     ConfigWindow *cw = new ConfigWindow(hotkeys);
 
     app.setQuitOnLastWindowClosed(false);
-    return app.exec();
+    int ret = app.exec();
+    setRegistered(hotkeys, false);
+    return ret;
 }

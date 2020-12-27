@@ -6,16 +6,10 @@
 #include <QCoreApplication>
 #include <QCloseEvent>
 
+#include "utils.h"
 #include "configwindow.h"
 #include "keydialog.h"
 
-void setRegistered(std::map<std::string, QHotkey *> hotkeys, bool registered)
-{
-    for (auto const& x : hotkeys)
-    {
-            (x.second)->setRegistered(registered);
-    }
-}
 
 ConfigWindow::ConfigWindow(std::map<std::string, QHotkey *> hotkeys, QWidget *parent)
     : QMainWindow(parent), trayIcon(new QSystemTrayIcon(this))
