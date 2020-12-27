@@ -1,3 +1,5 @@
+#include <QString>
+
 #include <tesseract/baseapi.h>
 #include <leptonica/allheaders.h>
 #include <map>
@@ -14,7 +16,7 @@ class OCR
 public:
     OCR();
     ~OCR();
-    char *ocrImage(char const *path, ORIENTATION orn);
+    char *ocrImage(QString path, ORIENTATION orn);
 
 private:
     tesseract::TessBaseAPI *tess;
@@ -22,7 +24,7 @@ private:
     char *result;
     PIX *image;
 
-    PIX *processImage(char const *path);
+    PIX *processImage(QString path);
     void extractText();
     void setLanguage(ORIENTATION orn);
     void setJapaneseParams();
