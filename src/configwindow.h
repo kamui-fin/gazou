@@ -1,23 +1,24 @@
 #include <QMainWindow>
 #include <QSystemTrayIcon>
-#include <vector>
 #include <QHotkey>
-#include <QMenu>
-#include <QtWidgets>
+#include <QSettings>
+#include <QPushButton>
+#include <QLabel>
+#include <vector>
 
 class ConfigWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    ConfigWindow(std::vector<QHotkey *>, QWidget *parent = 0);
+    ConfigWindow(std::map<std::string, QHotkey *> hotkeys, QWidget *parent = 0);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
 
 private:
     QWidget *widget;
-    std::vector<QHotkey *> hotkeys;
+    std::map<std::string, QHotkey *> hotkeys;
     QLabel *verticalKeybindLabel;
     QPushButton *verticalKeybindButton;
 

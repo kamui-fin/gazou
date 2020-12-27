@@ -1,13 +1,6 @@
-#include <QApplication>
-#include <QGuiApplication>
-#include <QDesktopWidget>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QScreen>
-#include <iostream>
 #include <QPainterPath>
-#include <QWindow>
-#include <QDebug>
 
 #include "selectorwidget.h"
 #include "utils.h"

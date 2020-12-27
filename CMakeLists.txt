@@ -38,7 +38,11 @@ find_package(PkgConfig)
 pkg_check_modules(TESSERACT REQUIRED tesseract>=4.1.1)
 pkg_check_modules(LEPTONICA REQUIRED lept>=1.80)
 
-find_package(Qt5 COMPONENTS Widgets X11Extras REQUIRED)
+find_package(Qt5Widgets REQUIRED VERSION 5.10)
+
+if (UNIX)
+  find_package(Qt5X11Extras REQUIRED)
+endif()
 
 find_package(QHotkey CONFIG)
 if (NOT QHotkey_FOUND)
