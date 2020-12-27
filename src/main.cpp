@@ -1,24 +1,16 @@
 #include <QApplication>
-#include <QDebug>
 #include <QHotkey>
 #include <QObject>
 #include <QClipboard>
-#include <QSignalMapper>
-#include <QObject>
-#include <QEventLoop>
-#include <QtWidgets>
-#include <QDir>
-
-#include <bits/stdc++.h>
-#include <string.h>
-#include <iostream>
 #include <vector>
+#include <map>
 
 #include "ocr.h"
 #include "configwindow.h"
 #include "selectorwidget.h"
 #include "utils.h"
 #include "config.h"
+
 
 void copyToClipboard(char *text, QClipboard *cb)
 {
@@ -36,16 +28,20 @@ QHotkey *setupOCRHotkey(QString sequence, void callback(ORIENTATION orn), ORIENT
 
 void runOCR(ORIENTATION orn)
 {
-    const char *imagePath = "/tmp/tempImg.png";
-
     static OCR *ocr = new OCR();
     static QClipboard *clipboard = QApplication::clipboard();
+
+    const char *imagePath = "/tmp/tempImg.png";
+
     SelectorWidget sw;
     sw.exec();
 
     char *result = ocr->ocrImage(imagePath, orn);
-    qDebug() << result;
     clipboard->setText(result);
+
+    #ifdef DEBUG
+        qDebug(result);
+    #endif
 }
 
 int main(int argc, char **argv)
@@ -59,7 +55,10 @@ int main(int argc, char **argv)
     QHotkey *vKey = setupOCRHotkey(verticalHotkey, runOCR, VERTICAL);
     QHotkey *hKey = setupOCRHotkey(horizontalHotkey, runOCR, HORIZONTAL);
 
-    std::vector<QHotkey *> hotkeys = {vKey, hKey};
+    std::map<std::string, QHotkey *> hotkeys = {
+        {"verticalOCR", vKey},
+        {"horizontalOCR", hKey},
+    };
 
     ConfigWindow *cw = new ConfigWindow(hotkeys);
 

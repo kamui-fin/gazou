@@ -1,9 +1,5 @@
 #include "ocr.h"
-#include <leptonica/allheaders.h>
-#include <string>
-#include <map>
-#include <iostream>
-#include <algorithm>
+#include "utils.h"
 #include "config.h"
 
 OCR::OCR()
@@ -72,14 +68,6 @@ void OCR::extractText()
   result = tess->GetUTF8Text();
 }
 
-void remove_spaces(char* s) {
-    const char* d = s;
-    do {
-        while (*d == ' ') {
-            ++d;
-        }
-    } while (*s++ = *d++);
-}
 
 char *OCR::ocrImage(char const *path, ORIENTATION orn)
 {
@@ -101,17 +89,12 @@ void OCR::setLanguage(ORIENTATION orn)
              tesseract::OEM_LSTM_ONLY);
   this->setJapaneseParams();
 
-  if (orn == VERTICAL)
-  {
-    tess->SetPageSegMode(tesseract::PSM_SINGLE_BLOCK_VERT_TEXT);
-  }
-  else if (orn == HORIZONTAL)
-  {
-    tess->SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
-  }
+  tesseract::PageSegMode pageSeg = orn == VERTICAL ? tesseract::PSM_SINGLE_BLOCK_VERT_TEXT : tesseract::PSM_SINGLE_BLOCK;
+  tess->SetPageSegMode(pageSeg);
 
   orientation = orn;
 }
+
 void OCR::setJapaneseParams()
 {
   tess->SetVariable("tessedit_char_blacklist", "}><L");
