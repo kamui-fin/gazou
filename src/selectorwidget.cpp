@@ -20,10 +20,11 @@ SelectorWidget::SelectorWidget(QWidget *parent) : QDialog(parent, Qt::FramelessW
 {
     QScreen *activeScreen = getActiveScreen();
     setAttribute(Qt::WA_TranslucentBackground);
-    setWindowFlags(Qt::BypassWindowManagerHint);
+    setWindowFlags(Qt::BypassWindowManagerHint | Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
 
     desktopPixmap = grabScreenshot();
     setGeometry(activeScreen->geometry());
+    showFullScreen();
     this->setCursor(Qt::CrossCursor);
 }
 
