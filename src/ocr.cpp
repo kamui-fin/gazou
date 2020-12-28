@@ -68,7 +68,6 @@ PIX *OCR::processImage(QString path)
   const char* imgDebugLocation = tempArrayDebug.constData();
 
   pixWrite(imgDebugLocation, pixs, IFF_PNG);
-  qDebug() << tempImgDebug ;
 #endif
   return pixs;
 }
