@@ -34,8 +34,8 @@ add_executable(${PROJECT_NAME} src/main.cpp
 
 find_package(PkgConfig)
 
-pkg_check_modules(TESSERACT REQUIRED tesseract>=4.1.1)
-pkg_check_modules(LEPTONICA REQUIRED lept>=1.80)
+pkg_check_modules(TESSERACT REQUIRED tesseract>=4.0.0)
+pkg_check_modules(LEPTONICA REQUIRED lept>=1.70)
 
 find_package(Qt5Widgets REQUIRED VERSION 5.10)
 
