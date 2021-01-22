@@ -8,6 +8,7 @@ enum ORIENTATION
 {
     HORIZONTAL,
     VERTICAL,
+    REPEAT,
     NONE,
 };
 

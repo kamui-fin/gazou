@@ -21,19 +21,28 @@ ConfigWindow::ConfigWindow(std::map<std::string, QHotkey *> hotkeys, QWidget *pa
     this->setCentralWidget(widget);
 
     verticalKeybindLabel = new QLabel(tr("Vertical OCR"));
-    horizontalKeybindLabel = new QLabel(tr("Horizontal OCR"));
     verticalKeybindButton = new QPushButton(settings->value("Hotkeys/verticalOCR", "Alt+A").toString(), widget);
     verticalKeybindButton->setObjectName("VertBtn");
+
+    horizontalKeybindLabel = new QLabel(tr("Horizontal OCR"));
     horizontalKeybindButton = new QPushButton(settings->value("Hotkeys/horizontalOCR", "Alt+D").toString(), widget);
     horizontalKeybindButton->setObjectName("HorBtn");
 
+    repeatKeybindLabel = new QLabel(tr("Repeat OCR"));
+    repeatKeybindButton = new QPushButton(settings->value("Hotkeys/repeatOCR", "Alt+F").toString(), widget);
+    repeatKeybindButton->setObjectName("RepBtn");
+
+
     verticalKeybindLabel->setStyleSheet("margin-right: 5px;");
     horizontalKeybindLabel->setStyleSheet("margin-right: 8px;");
+    repeatKeybindLabel->setStyleSheet("margin-right: 8px;");
     QGridLayout *mainLayout = new QGridLayout(widget);
     mainLayout->addWidget(verticalKeybindLabel, 0, 0);
     mainLayout->addWidget(verticalKeybindButton, 0, 1);
     mainLayout->addWidget(horizontalKeybindLabel, 1, 0);
     mainLayout->addWidget(horizontalKeybindButton, 1, 1);
+    mainLayout->addWidget(repeatKeybindLabel, 2, 0);
+    mainLayout->addWidget(repeatKeybindButton, 2, 1);
     setFixedSize(sizeHint());
 
     QMenu *menu = this->createMenu();
@@ -49,6 +58,7 @@ ConfigWindow::ConfigWindow(std::map<std::string, QHotkey *> hotkeys, QWidget *pa
 
     connect(verticalKeybindButton, &QPushButton::clicked, this, &ConfigWindow::handleHotkeyButton);
     connect(horizontalKeybindButton, &QPushButton::clicked, this, &ConfigWindow::handleHotkeyButton);
+    connect(repeatKeybindButton, &QPushButton::clicked, this, &ConfigWindow::handleHotkeyButton);
 }
 
 QMenu *ConfigWindow::createMenu()
@@ -96,7 +106,15 @@ void ConfigWindow::handleHotkeyButton()
     if (setKeyDialog.exec() == QDialog::Accepted)
     {
         button->setText(setKeyDialog.getKeySeq());
-        QString shortKeyName = button->objectName() == "HorBtn" ? "horizontalOCR" : "verticalOCR";
+        QString shortKeyName;
+        if(button->objectName()=="HorBtn"){
+            shortKeyName = "horizontalOCR";
+        } else if(button->objectName()=="VertBtn"){
+            shortKeyName = "verticalOCR";
+        } else {
+            shortKeyName = "repeatOCR";
+        }
+
         QString key = "Hotkeys/";
         key.append(shortKeyName);
         QString value = setKeyDialog.getKeySeq();

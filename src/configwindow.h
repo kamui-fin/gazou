@@ -25,6 +25,9 @@ private:
     QLabel *horizontalKeybindLabel;
     QPushButton *horizontalKeybindButton;
 
+    QLabel *repeatKeybindLabel;
+    QPushButton *repeatKeybindButton;
+
     QSystemTrayIcon *trayIcon;
     QMenu *trayIconMenu;
 

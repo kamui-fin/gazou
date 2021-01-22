@@ -12,6 +12,9 @@
 #include "utils.h"
 #include "config.h"
 
+#include <iostream>
+
+bool prev_HORIZONTAL {true};
 
 QHotkey *setupOCRHotkey(QString sequence, void callback(ORIENTATION orn), ORIENTATION orn)
 {
@@ -43,19 +46,22 @@ void runOCR(ORIENTATION orn)
 
 int main(int argc, char **argv)
 {
+    std::cout << prev_HORIZONTAL;
     QApplication app(argc, argv);
-
     QSettings settings("gazou", "gazou");
 
     QString verticalHotkey = settings.value("Hotkeys/verticalOCR", "Alt+A").toString();
     QString horizontalHotkey = settings.value("Hotkeys/horizontalOCR", "Alt+D").toString();
+    QString repeatHotkey = settings.value("Hotkeys/repeatOCR", "Alt+F").toString();
 
     QHotkey *vKey = setupOCRHotkey(verticalHotkey, runOCR, VERTICAL);
     QHotkey *hKey = setupOCRHotkey(horizontalHotkey, runOCR, HORIZONTAL);
+    QHotkey *rKey = setupOCRHotkey(repeatHotkey, runOCR, REPEAT);
 
     std::map<std::string, QHotkey *> hotkeys = {
         {"verticalOCR", vKey},
         {"horizontalOCR", hKey},
+        {"repeatOCR", rKey}
     };
 
     ConfigWindow *cw = new ConfigWindow(hotkeys);
