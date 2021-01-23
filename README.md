@@ -38,6 +38,6 @@ You can run the program by typing `gazou` in your terminal. It runs in the backg
 
 - `Alt+A`: Vertical OCR
 - `Alt+D`: Horizontal OCR
-- 'Alt+F': Repeat previous OCR
+- `Alt+F`: Repeat previous OCR
 
 When you perform an OCR, the result text gets copied to the clipboard.
