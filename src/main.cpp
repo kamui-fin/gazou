@@ -35,7 +35,7 @@ void runOCR(ORIENTATION orn, bool prevHor)
     else{
         sw.exec();
     }
-    prevHor = orn==HORIZONTAL ? true : false;
+    prevHor = orn==HORIZONTAL;
 
     char *result = ocr->ocrImage(imagePath, orn);
     clipboard->setText(result);
