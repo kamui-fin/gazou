@@ -1,13 +1,4 @@
-#include <QApplication>
-#include <QHotkey>
-#include <QObject>
-#include <QClipboard>
-#include <QDir>
-#include <QDebug>
-#include <QPainter>
-#include <vector>
-#include <map>
-
+#include "main.h"
 #include "ocr.h"
 #include "configwindow.h"
 #include "selectorwidget.h"
@@ -32,10 +23,9 @@ void runOCR(ORIENTATION orn, bool prevHor)
     QString imagePath = QDir::tempPath().append(QDir::separator()).append("tempImg.png");
 
     SelectorWidget sw;
-    QPoint zero = QPoint(0,0);
     if(orn==REPEAT){
         orn = prevHor ? HORIZONTAL : VERTICAL;
-        if(sw.savedRect.topLeft()!=zero && sw.savedRect.bottomRight()!=zero){
+        if(sw.savedRect.topLeft()!=constants::zero && sw.savedRect.bottomRight()!=constants::zero){
             sw.grabUsingSavedRect();
         }
         else{
