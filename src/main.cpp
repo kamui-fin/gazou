@@ -3,6 +3,8 @@
 #include <QObject>
 #include <QClipboard>
 #include <QDir>
+#include <QDebug>
+#include <QPainter>
 #include <vector>
 #include <map>
 
@@ -12,20 +14,17 @@
 #include "utils.h"
 #include "config.h"
 
-#include <iostream>
-
-bool prev_HORIZONTAL {true};
-
-QHotkey *setupOCRHotkey(QString sequence, void callback(ORIENTATION orn), ORIENTATION orn)
+QHotkey *setupOCRHotkey(
+    QString sequence, void callback(ORIENTATION orn, bool prevHor), ORIENTATION orn, bool prevHor)
 {
     QHotkey *hotkey = new QHotkey(QKeySequence(sequence), true, qApp);
     QObject::connect(hotkey, &QHotkey::activated, qApp, [=]() {
-        callback(orn);
+        callback(orn,prevHor);
     });
     return hotkey;
 }
 
-void runOCR(ORIENTATION orn)
+void runOCR(ORIENTATION orn, bool prevHor)
 {
     static OCR *ocr = new OCR();
     static QClipboard *clipboard = QApplication::clipboard();
@@ -33,7 +32,20 @@ void runOCR(ORIENTATION orn)
     QString imagePath = QDir::tempPath().append(QDir::separator()).append("tempImg.png");
 
     SelectorWidget sw;
-    sw.exec();
+    QPoint zero = QPoint(0,0);
+    if(orn==REPEAT){
+        orn = prevHor ? HORIZONTAL : VERTICAL;
+        if(sw.savedRect.topLeft()!=zero && sw.savedRect.bottomRight()!=zero){
+            sw.grabUsingSavedRect();
+        }
+        else{
+            sw.exec();
+        }
+    }
+    else{
+        sw.exec();
+    }
+    prevHor = orn==HORIZONTAL ? true : false;
 
     char *result = ocr->ocrImage(imagePath, orn);
     clipboard->setText(result);
@@ -46,7 +58,8 @@ void runOCR(ORIENTATION orn)
 
 int main(int argc, char **argv)
 {
-    std::cout << prev_HORIZONTAL;
+    bool prevHor = true;
+
     QApplication app(argc, argv);
     QSettings settings("gazou", "gazou");
 
@@ -54,9 +67,9 @@ int main(int argc, char **argv)
     QString horizontalHotkey = settings.value("Hotkeys/horizontalOCR", "Alt+D").toString();
     QString repeatHotkey = settings.value("Hotkeys/repeatOCR", "Alt+F").toString();
 
-    QHotkey *vKey = setupOCRHotkey(verticalHotkey, runOCR, VERTICAL);
-    QHotkey *hKey = setupOCRHotkey(horizontalHotkey, runOCR, HORIZONTAL);
-    QHotkey *rKey = setupOCRHotkey(repeatHotkey, runOCR, REPEAT);
+    QHotkey *vKey = setupOCRHotkey(verticalHotkey, runOCR, VERTICAL, prevHor);
+    QHotkey *hKey = setupOCRHotkey(horizontalHotkey, runOCR, HORIZONTAL, prevHor);
+    QHotkey *rKey = setupOCRHotkey(repeatHotkey, runOCR, REPEAT, prevHor);
 
     std::map<std::string, QHotkey *> hotkeys = {
         {"verticalOCR", vKey},

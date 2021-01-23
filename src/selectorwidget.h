@@ -6,6 +6,8 @@ class SelectorWidget : public QDialog
 public:
     explicit SelectorWidget(QWidget *parent = nullptr);
     QPixmap selectedPixmap;
+    static QRect savedRect;
+    void grabUsingSavedRect();
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

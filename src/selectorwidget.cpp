@@ -5,6 +5,8 @@
 #include "selectorwidget.h"
 #include "utils.h"
 
+QRect SelectorWidget::savedRect = QRect(0,0,0,0);
+
 QPixmap grabScreenshot()
 {
     QScreen *activeScreen = getActiveScreen();
@@ -45,7 +47,17 @@ void SelectorWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     selectedPixmap = desktopPixmap.copy(selectedRect.normalized());
     selectedPixmap.toImage().save("/tmp/tempImg.png");
+
+    savedRect.setTopLeft(selectedRect.topLeft());
+    savedRect.setBottomRight(selectedRect.bottomRight());
     selectedRect.setRect(0,0,0,0);
+    accept();
+}
+
+void SelectorWidget::grabUsingSavedRect()
+{
+    selectedPixmap = desktopPixmap.copy(savedRect.normalized());
+    selectedPixmap.toImage().save("/tmp/tempImg.png");
     accept();
 }
 
