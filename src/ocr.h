@@ -1,31 +1,30 @@
 #include <QString>
 
-#include <tesseract/baseapi.h>
 #include <leptonica/allheaders.h>
 #include <map>
+#include <tesseract/baseapi.h>
 
-enum ORIENTATION
-{
-    HORIZONTAL,
-    VERTICAL,
-    NONE,
+enum ORIENTATION {
+  HORIZONTAL,
+  VERTICAL,
+  NONE,
 };
 
-class OCR
-{
+class OCR {
 public:
-    OCR();
-    ~OCR();
-    char *ocrImage(QString path, ORIENTATION orn);
+  OCR();
+  ~OCR();
+  char *ocrImage(QString path, ORIENTATION orn);
 
 private:
-    tesseract::TessBaseAPI *tess;
-    ORIENTATION orientation = NONE;
-    char *result;
-    PIX *image;
+  tesseract::TessBaseAPI *tess;
+  ORIENTATION orientation;
+  QString lang;
+  char *result;
+  PIX *image;
 
-    PIX *processImage(QString path);
-    void extractText();
-    void setLanguage(ORIENTATION orn);
-    void setJapaneseParams();
+  PIX *processImage(QString path);
+  void extractText();
+  void setLanguage(ORIENTATION orn);
+  void setJapaneseParams();
 };
