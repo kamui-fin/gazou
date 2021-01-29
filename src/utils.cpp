@@ -1,36 +1,41 @@
+#include <QClipboard>
 #include <QCursor>
 #include <QGuiApplication>
 #include <QHotkey>
-#include <QClipboard>
+#include <QPainter>
+#include <QPixmap>
 
 #include "utils.h"
 
-QScreen *getActiveScreen()
-{
-    QPoint globalCursorPos = QCursor::pos();
-    QScreen *activeScreen = QGuiApplication::screenAt(globalCursorPos);
-    return activeScreen;
+QScreen *getActiveScreen() {
+  QPoint globalCursorPos = QCursor::pos();
+  QScreen *activeScreen = QGuiApplication::screenAt(globalCursorPos);
+  return activeScreen;
 }
 
-
-void remove_spaces(char* s) {
-    const char* d = s;
-    do {
-        while (*d == ' ') {
-            ++d;
-        }
-    } while (*s++ = *d++);
-}
-
-void setRegistered(std::map<std::string, QHotkey *> hotkeys, bool registered)
-{
-    for (auto const& x : hotkeys)
-    {
-            (x.second)->setRegistered(registered);
+void remove_spaces(char *s) {
+  const char *d = s;
+  do {
+    while (*d == ' ') {
+      ++d;
     }
+  } while (*s++ = *d++);
 }
 
-void copyToClipboard(char *text, QClipboard *cb)
-{
-    cb->setText(text);
+void setRegistered(std::map<std::string, QHotkey *> hotkeys, bool registered) {
+  for (auto const &x : hotkeys) {
+    (x.second)->setRegistered(registered);
+  }
+}
+
+void copyToClipboard(char *text, QClipboard *cb) { cb->setText(text); }
+
+QPixmap grabScreenshot() {
+  QScreen *activeScreen = getActiveScreen();
+  QPixmap desktopPixmap = QPixmap(activeScreen->geometry().size());
+  QPainter p(&desktopPixmap);
+
+  p.drawPixmap(*(new QPoint(0, 0)), activeScreen->grabWindow(0));
+
+  return desktopPixmap;
 }
