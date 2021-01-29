@@ -20,6 +20,19 @@ endif()
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
+file(GLOB_RECURSE
+     ALL_CXX_SOURCE_FILES
+     *.[chi]pp *.[chi]xx *.cc *.hh *.ii *.[CHI]
+)
+
+add_custom_target(
+    format
+    COMMAND /usr/bin/clang-format
+    -i
+    -style=file
+    ${ALL_CXX_SOURCE_FILES}
+)
+
 configure_file(src/config.h.in config.h)
 include_directories(${PROJECT_BINARY_DIR})
 
@@ -29,6 +42,7 @@ add_executable(${PROJECT_NAME} src/main.cpp
                                src/keydialog.cpp
                                src/utils.cpp
                                src/ocr.cpp
+                               src/state.cpp
                                resources/resources.qrc
 )
 

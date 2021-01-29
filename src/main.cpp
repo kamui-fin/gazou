@@ -1,67 +1,92 @@
 #include <QApplication>
-#include <QHotkey>
-#include <QObject>
 #include <QClipboard>
 #include <QDir>
-#include <vector>
+#include <QHotkey>
+#include <QObject>
+#include <QPixmap>
 #include <map>
+#include <vector>
 
-#include "ocr.h"
+#include "config.h"
 #include "configwindow.h"
 #include "selectorwidget.h"
+#include "state.h"
 #include "utils.h"
-#include "config.h"
 
+State state;
+OCR *ocr;
+QClipboard *clipboard;
+QString imagePath =
+    QDir::tempPath().append(QDir::separator()).append("tempImg.png");
 
-QHotkey *setupOCRHotkey(QString sequence, void callback(ORIENTATION orn), ORIENTATION orn)
-{
-    QHotkey *hotkey = new QHotkey(QKeySequence(sequence), true, qApp);
-    QObject::connect(hotkey, &QHotkey::activated, qApp, [=]() {
-        callback(orn);
-    });
-    return hotkey;
+QHotkey *setupOCRHotkey(QString sequence, void callback(ORIENTATION orn),
+                        ORIENTATION orn = NONE) {
+  QHotkey *hotkey = new QHotkey(QKeySequence(sequence), true, qApp);
+  QObject::connect(hotkey, &QHotkey::activated, qApp, [=]() { callback(orn); });
+  return hotkey;
 }
 
-void runOCR(ORIENTATION orn)
-{
-    static OCR *ocr = new OCR();
-    static QClipboard *clipboard = QApplication::clipboard();
+void runRegOCR(ORIENTATION orn) {
 
-    QString imagePath = QDir::tempPath().append(QDir::separator()).append("tempImg.png");
-
+  if (!state.getCurrentlySelecting()) {
+    state.setCurrentlySelecting(true);
     SelectorWidget sw;
     sw.exec();
+    state.setCurrentlySelecting(false);
 
     char *result = ocr->ocrImage(imagePath, orn);
     clipboard->setText(result);
 
-    #ifdef DEBUG
-        qDebug(result);
-    #endif
+    LastOCRInfo info = {orn, sw.lastSelectedRect};
+    state.setLastOCRInfo(info);
+
+#ifdef DEBUG
+    qDebug(result);
+#endif
+  }
 }
 
+void runPrevOCR(ORIENTATION _) {
+  QPixmap desktopPixmap = grabScreenshot();
+  QPixmap selectedPixmap =
+      desktopPixmap.copy(state.getLastOCRInfo().rect.normalized());
+  selectedPixmap.toImage().save("/tmp/tempImg.png");
 
-int main(int argc, char **argv)
-{
-    QApplication app(argc, argv);
+  ORIENTATION orn = state.getLastOCRInfo().orn;
+  if (orn != NONE) {
+    char *result = ocr->ocrImage(imagePath, orn);
+    clipboard->setText(result);
+#ifdef DEBUG
+    qDebug(result);
+#endif
+  }
+}
 
-    QSettings settings("gazou", "gazou");
+int main(int argc, char **argv) {
+  QApplication app(argc, argv);
+  clipboard = QApplication::clipboard();
+  ocr = new OCR();
 
-    QString verticalHotkey = settings.value("Hotkeys/verticalOCR", "Alt+A").toString();
-    QString horizontalHotkey = settings.value("Hotkeys/horizontalOCR", "Alt+D").toString();
+  QSettings settings("gazou", "gazou");
 
-    QHotkey *vKey = setupOCRHotkey(verticalHotkey, runOCR, VERTICAL);
-    QHotkey *hKey = setupOCRHotkey(horizontalHotkey, runOCR, HORIZONTAL);
+  QString verticalHotkey =
+      settings.value("Hotkeys/verticalOCR", "Alt+A").toString();
+  QString horizontalHotkey =
+      settings.value("Hotkeys/horizontalOCR", "Alt+D").toString();
+  QString prevOCRHotkey =
+      settings.value("Hotkeys/repeatOCR", "Alt+S").toString();
 
-    std::map<std::string, QHotkey *> hotkeys = {
-        {"verticalOCR", vKey},
-        {"horizontalOCR", hKey},
-    };
+  QHotkey *vKey = setupOCRHotkey(verticalHotkey, runRegOCR, VERTICAL);
+  QHotkey *hKey = setupOCRHotkey(horizontalHotkey, runRegOCR, HORIZONTAL);
+  QHotkey *prevKey = setupOCRHotkey(prevOCRHotkey, runPrevOCR);
 
-    ConfigWindow *cw = new ConfigWindow(hotkeys);
+  std::map<std::string, QHotkey *> hotkeys = {
+      {"verticalOCR", vKey}, {"horizontalOCR", hKey}, {"repeatOCR", prevKey}};
 
-    app.setQuitOnLastWindowClosed(false);
-    int ret = app.exec();
-    setRegistered(hotkeys, false);
-    return ret;
+  ConfigWindow *cw = new ConfigWindow(hotkeys);
+
+  app.setQuitOnLastWindowClosed(false);
+  int ret = app.exec();
+  setRegistered(hotkeys, false);
+  return ret;
 }
