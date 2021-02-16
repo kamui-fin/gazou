@@ -1,6 +1,6 @@
 # Gazou OCR 
 
-Gazou is a Japanese OCR for Linux written in C++. It utilizes image processing, and other parameters to improve the accuracy. I plan on finetuning the models in the future with a wide variety of fonts for better recognition. All contributions are welcome.
+Gazou is a Japanese OCR for Linux written in C++. It utilizes image processing, and other parameters to improve the accuracy. All contributions are welcome.
 
 ## Installation
 
@@ -38,5 +38,13 @@ You can run the program by typing `gazou` in your terminal. It runs in the backg
 
 - `Alt+A`: Vertical OCR
 - `Alt+D`: Horizontal OCR
+- `Alt+S`: Repeat the previous OCR
 
 When you perform an OCR, the result text gets copied to the clipboard.
+
+Gazou also has a command line mode, and this can be useful for integrating it with bash scripts. It takes two different parameters, the image path and the orientation, which is either `vertical` or `horizontal`. Here's an example:
+
+```bash
+gazou page103.png horizontal
+```
+This command scans all the text in the image and prints the resulting text.
