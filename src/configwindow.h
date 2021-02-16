@@ -8,33 +8,33 @@
 #include <vector>
 
 class ConfigWindow : public QMainWindow {
-  Q_OBJECT
+    Q_OBJECT
 
-public:
-  ConfigWindow(std::map<std::string, QHotkey *> hotkeys, QWidget *parent = 0);
+    public:
+        ConfigWindow(std::map<std::string, QHotkey *> hotkeys, QWidget *parent = 0);
 
-protected:
-  void closeEvent(QCloseEvent *event) override;
+    protected:
+        void closeEvent(QCloseEvent *event) override;
 
-private:
-  std::map<std::string, QHotkey *> hotkeys;
+    private:
+        std::map<std::string, QHotkey *> hotkeys;
 
-  QWidget *widget;
-  QLabel *verticalKeybindLabel;
-  QPushButton *verticalKeybindButton;
+        QWidget *widget;
+        QLabel *verticalKeybindLabel;
+        QPushButton *verticalKeybindButton;
 
-  QLabel *horizontalKeybindLabel;
-  QPushButton *horizontalKeybindButton;
+        QLabel *horizontalKeybindLabel;
+        QPushButton *horizontalKeybindButton;
 
-  QLabel *lastOCRKeybindLabel;
-  QPushButton *lastOCRKeybindButton;
+        QLabel *lastOCRKeybindLabel;
+        QPushButton *lastOCRKeybindButton;
 
-  QSystemTrayIcon *trayIcon;
-  QMenu *trayIconMenu;
+        QSystemTrayIcon *trayIcon;
+        QMenu *trayIconMenu;
 
-  QSettings *settings;
+        QSettings *settings;
 
-  QMenu *createMenu();
-  void iconActivated(QSystemTrayIcon::ActivationReason reason);
-  void handleHotkeyButton();
+        QMenu *createMenu();
+        void iconActivated(QSystemTrayIcon::ActivationReason reason);
+        void handleHotkeyButton();
 };
