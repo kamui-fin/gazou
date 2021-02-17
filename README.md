@@ -45,6 +45,8 @@ When you perform an OCR, the result text gets copied to the clipboard.
 Gazou also has a command line mode, and this can be useful for integrating it with bash scripts. It takes two different parameters, the image path and the orientation, which is either `vertical` or `horizontal`. Here's an example:
 
 ```bash
-gazou page103.png horizontal
+gazou horizontal page103.png
 ```
 This command scans all the text in the image and prints the resulting text.
+
+For more help Use: `gazou --help`
