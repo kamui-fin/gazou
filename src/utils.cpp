@@ -29,7 +29,7 @@ void remove_spaces(char *s) {
 	space_flag = 1;
 	break;
       case '\n':
-	if (++newline_flag>2){
+	if (++newline_flag > 2){
 	  // >2 as \n for continuation line and \n\n for new lines.
 	  ++d;
 	  continue;
