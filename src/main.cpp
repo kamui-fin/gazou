@@ -72,8 +72,8 @@ int main(int argc, char **argv) {
 	qInfo("\t%s", "Run the main application.");
 	qInfo("2) %s %s", argv[0],"help/ --help");
 	qInfo("\t%s", "Display this message.");
-	qInfo("3) %s %s", argv[0], "ORIENTATION IMAGEFILE");
-	qInfo("\t%s", "Run the OCR on the given IMAGEFILE with given ORIENTATION.");
+	qInfo("3) %s %s", argv[0], "ORIENTATION{-h; -v; horizontal; vertical} IMAGEFILE");
+	qInfo("\tRun the OCR on the given IMAGEFILE with given ORIENTATION.");
 	exit(0);
       }
       if (argc > 2){
