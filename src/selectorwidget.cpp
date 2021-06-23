@@ -7,16 +7,16 @@
 
 SelectorWidget::SelectorWidget(QWidget *parent)
     : QDialog(parent, Qt::FramelessWindowHint) {
-        QScreen *activeScreen = getActiveScreen();
-        setAttribute(Qt::WA_TranslucentBackground);
-        setWindowFlags(Qt::BypassWindowManagerHint | Qt::WindowStaysOnTopHint |
-                Qt::FramelessWindowHint);
+    QScreen *activeScreen = getActiveScreen();
+    setAttribute(Qt::WA_TranslucentBackground);
+    setWindowFlags(Qt::BypassWindowManagerHint | Qt::WindowStaysOnTopHint |
+                   Qt::FramelessWindowHint);
 
-        desktopPixmap = grabScreenshot();
-        setGeometry(activeScreen->geometry());
-        showFullScreen();
-        this->setCursor(Qt::CrossCursor);
-    }
+    desktopPixmap = grabScreenshot();
+    setGeometry(activeScreen->geometry());
+    showFullScreen();
+    this->setCursor(Qt::CrossCursor);
+}
 
 void SelectorWidget::mousePressEvent(QMouseEvent *event) {
     QPoint *pnt = new QPoint(event->localPos().x(), event->localPos().y());
@@ -31,7 +31,7 @@ void SelectorWidget::mouseMoveEvent(QMouseEvent *event) {
 
 void SelectorWidget::mouseReleaseEvent(QMouseEvent *event) {
     selectedPixmap = desktopPixmap.copy(selectedRect.normalized());
-    selectedPixmap.toImage().save("/tmp/tempImg.png");
+    selectedPixmap.toImage().save(getTempImage());
     lastSelectedRect = selectedRect;
     selectedRect.setRect(0, 0, 0, 0);
     accept();

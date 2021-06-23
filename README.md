@@ -24,8 +24,8 @@ These dependencies will need to be installed by your system's package manager.
 ### Install
 
 ```sh
-git clone --recursive https://github.com/kamui-7/Gazou-OCR.git
-cd Gazou-OCR
+git clone --recursive https://github.com/kamui-7/gazou.git
+cd gazou
 mkdir build
 cd build
 cmake .. 
@@ -34,7 +34,7 @@ sudo make install
 
 ## Usage
 
-You can run the program by typing `gazou` in your terminal. It runs in the background and should appear in your system tray. If you click on the app in the tray, a settings dialog should appear. In here, you can customize the keybinds to your liking. The default hotkeys are
+You can run the program by typing `gazou` in your terminal. It runs in the background and should appear in your system tray. If you click on the app in the tray, a settings dialog should appear. In here, you can customize the keybinds to your liking. The default hotkeys are:
 
 - `Alt+A`: Vertical OCR
 - `Alt+D`: Horizontal OCR
@@ -49,4 +49,4 @@ gazou -h page103.png
 ```
 This command scans all the text in the image and prints the resulting text.
 
-For more help Use: `gazou --help`
+For more help, run `gazou --help`.

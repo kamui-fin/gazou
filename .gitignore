@@ -99,3 +99,4 @@ build/*
 *_qmlcache.qrc
 .ccls-cache
 .vscode
+.cache
