@@ -13,11 +13,6 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
 
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release")
-  message(STATUS "Build type not specified: Using Release by default")
-endif()
-
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
 configure_file(src/config.h.in config.h)
@@ -67,4 +62,3 @@ add_custom_target(
     -style=file
     ${ALL_CXX_SOURCE_FILES}
 )
-
