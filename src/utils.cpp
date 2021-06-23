@@ -4,6 +4,7 @@
 #include <QHotkey>
 #include <QPainter>
 #include <QPixmap>
+#include <qdir.h>
 #include <sys/stat.h>
 
 #include "utils.h"
@@ -19,26 +20,27 @@ void remove_spaces(char *s) {
     int space_flag = 0;
     int newline_flag = 0;
     do {
-      switch (*d){
-      case ' ':
-      case '\t':
-	if (space_flag){
-	  ++d;
-	  continue;
-	}
-	space_flag = 1;
-	break;
-      case '\n':
-	if (++newline_flag > 2){
-	  // >2 as \n for continuation line and \n\n for new lines.
-	  ++d;
-	  continue;
-	}
-	break;
-      default:
-	space_flag = 0;
-	newline_flag = 0;
-      }
+        switch (*d) {
+        case ' ':
+        case '\t':
+            if (space_flag) {
+                ++d;
+                continue;
+            }
+            space_flag = 1;
+            break;
+        case '\n':
+            if (++newline_flag > 2) {
+                // >2 as \n for continuation line and \n\n for new
+                // lines.
+                ++d;
+                continue;
+            }
+            break;
+        default:
+            space_flag = 0;
+            newline_flag = 0;
+        }
     } while (*s++ = *d++);
 }
 
@@ -60,9 +62,17 @@ QPixmap grabScreenshot() {
     return desktopPixmap;
 }
 
+bool pathExist(const char *s) {
+    struct stat buffer;
+    return (stat(s, &buffer) == 0);
+}
 
-bool pathExist(const char* s)
-{
-  struct stat buffer;
-  return (stat (s, &buffer) == 0);
+QString getTempImage(bool debugFile) {
+    QString name = debugFile ? "tempDebugOcrImage.png" : "tempOcrImg.png";
+    return QDir::temp().filePath(name);
+}
+
+const char *convertToCString(QString src) {
+    QByteArray byteArray = src.toUtf8();
+    return byteArray.constData();
 }

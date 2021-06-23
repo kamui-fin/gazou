@@ -1,6 +1,7 @@
 #include <QDir>
 #include <QString>
 #include <iostream>
+#include <qdir.h>
 
 #include "config.h"
 #include "ocr.h"
@@ -14,7 +15,7 @@ OCR::OCR() {
 OCR::~OCR() {
     tess->End();
     delete tess;
-    delete [] result;
+    delete[] result;
     pixDestroy(&image);
 }
 
@@ -32,14 +33,13 @@ PIX *OCR::processImage(QString path) {
     QByteArray array = path.toUtf8();
     const char *imageLocation = array.constData();
     PIX *pixs = pixRead(imageLocation);
-    if (pixGetDepth(pixs) == 8){
-      // Already Grayscale so no conversion required.
-      ;
-      // FIXME Find a better solution for this, Couldn't find how to
-      // check for number of bands with pixmap
-    }else{
-      // Convert to grayscale
-      pixs = pixConvertRGBToGray(pixs, 0.0, 0.0, 0.0);
+    if (pixGetDepth(pixs) == 8) {
+        // Already Grayscale so no conversion required.
+        // FIXME Find a better solution for this, Couldn't find how to
+        // check for number of bands with pixmap
+    } else {
+        // Convert to grayscale
+        pixs = pixConvertRGBToGray(pixs, 0.0, 0.0, 0.0);
     }
 
     // Resize
@@ -47,9 +47,9 @@ PIX *OCR::processImage(QString path) {
 
     pixs = pixUnsharpMaskingGray(pixs, usmHalfwidth, usmFract);
     pixOtsuAdaptiveThreshold(pixs, otsuSX, otsuSY, otsuSmoothX, otsuSmoothY,
-            otsuScorefract, nullptr, &pixs);
+                             otsuScorefract, nullptr, &pixs);
     pixs = pixSelectBySize(pixs, 3, 3, 8, L_SELECT_IF_EITHER, L_SELECT_IF_GT,
-            nullptr);
+                           nullptr);
 
     // Decide if image needs to be inverted or not
     float pixelAvg = pixAverageOnLine(pixs, 0, 0, pixs->w - 1, 0, 1);
@@ -66,13 +66,9 @@ PIX *OCR::processImage(QString path) {
 
     // Add a border
     pixs = pixAddBlackOrWhiteBorder(pixs, 10, 10, 10, 10, L_GET_WHITE_VAL);
-
 #ifdef DEBUG
-    QString tempImgDebug = "/tmp/tempImgDebug.png";
-    QByteArray tempArrayDebug = tempImgDebug.toUtf8();
-    const char *imgDebugLocation = tempArrayDebug.constData();
-
-    pixWrite(imgDebugLocation, pixs, IFF_PNG);
+    QString loc = getTempImage(true);
+    pixWrite(convertToCString(loc), pixs, IFF_PNG);
 #endif
     return pixs;
 }
@@ -101,13 +97,13 @@ void OCR::setLanguage(ORIENTATION orn) {
     }
 
     tess->Init(GAZOU_MODEL_FOLDER, lang.toLocal8Bit().constData(),
-                tesseract::OEM_LSTM_ONLY);
+               tesseract::OEM_LSTM_ONLY);
 
     this->setJapaneseParams();
 
     tesseract::PageSegMode pageSeg = orn == VERTICAL
-        ? tesseract::PSM_SINGLE_BLOCK_VERT_TEXT
-        : tesseract::PSM_SINGLE_BLOCK;
+                                         ? tesseract::PSM_SINGLE_BLOCK_VERT_TEXT
+                                         : tesseract::PSM_SINGLE_BLOCK;
 
     tess->SetPageSegMode(pageSeg);
 
@@ -128,5 +124,5 @@ void OCR::setJapaneseParams() {
     tess->SetVariable("textord_initialx_ile", "1.0");
     tess->SetVariable("preserve_interword_spaces", "1");
     tess->SetVariable("user_defined_dpi", "300");
-    tess->SetVariable("debug_file", "/dev/null"); 
+    tess->SetVariable("debug_file", "/dev/null");
 }

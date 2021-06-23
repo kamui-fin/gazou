@@ -20,31 +20,21 @@ endif()
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
-file(GLOB_RECURSE
-     ALL_CXX_SOURCE_FILES
-     *.[chi]pp *.[chi]xx *.cc *.hh *.ii *.[CHI]
-)
-
-add_custom_target(
-    format
-    COMMAND /usr/bin/clang-format
-    -i
-    -style=file
-    ${ALL_CXX_SOURCE_FILES}
-)
-
 configure_file(src/config.h.in config.h)
 include_directories(${PROJECT_BINARY_DIR})
 
-add_executable(${PROJECT_NAME} src/main.cpp 
-                               src/configwindow.cpp
-                               src/selectorwidget.cpp
-                               src/keydialog.cpp
-                               src/utils.cpp
-                               src/ocr.cpp
-                               src/state.cpp
-                               resources/resources.qrc
+add_executable(${PROJECT_NAME} 
+    src/main.cpp 
+    src/configwindow.cpp
+    src/selectorwidget.cpp
+    src/keydialog.cpp
+    src/utils.cpp
+    src/ocr.cpp
+    src/state.cpp
+    resources/resources.qrc
 )
+
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
 
 find_package(PkgConfig)
 
@@ -52,10 +42,7 @@ pkg_check_modules(TESSERACT REQUIRED tesseract>=4.0.0)
 pkg_check_modules(LEPTONICA REQUIRED lept>=1.70)
 
 find_package(Qt5Widgets REQUIRED VERSION 5.10)
-
-if (UNIX)
-  find_package(Qt5X11Extras REQUIRED)
-endif()
+find_package(Qt5X11Extras REQUIRED)
 
 find_package(QHotkey CONFIG QUIET)
 if (NOT QHotkey_FOUND)
@@ -66,3 +53,18 @@ target_link_libraries(${PROJECT_NAME} Qt5::Widgets qhotkey tesseract lept)
 
 install(TARGETS gazou RUNTIME DESTINATION bin)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/models DESTINATION share/gazou)
+
+# format entire project
+file(GLOB_RECURSE
+     ALL_CXX_SOURCE_FILES
+     *.[chi]pp *.[chi]xx *.cc *.hh *.ii *.[CHI]
+)
+
+add_custom_target(
+    format
+    COMMAND /usr/lib/llvm/11/bin/clang-format
+    -i
+    -style=file
+    ${ALL_CXX_SOURCE_FILES}
+)
+
