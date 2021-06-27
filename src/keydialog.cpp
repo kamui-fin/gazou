@@ -23,12 +23,17 @@ KeyDialog::KeyDialog(QDialog *parent) : QDialog(parent) {
 void KeyDialog::keyPressEvent(QKeyEvent *e) {
     int key = e->key();
     QKeySequence *sequence;
-    if (key == Qt::Key_Control || key == Qt::Key_Shift || key == Qt::Key_Alt ||
-        key == Qt::Key_Meta) {
+    switch (key) {
+    case Qt::Key_Control:
+    case Qt::Key_Shift:
+    case Qt::Key_Alt:
+    case Qt::Key_Meta:
         sequence = new QKeySequence(e->modifiers());
-    } else if (key == Qt::Key_Super_L || key == Qt::Key_Super_R) {
+        break;
+    case Qt::Key_Super_L:
+    case Qt::Key_Super_R:
         return;
-    } else {
+    default:
         sequence = new QKeySequence(e->key() | e->modifiers());
     }
     keyseq = sequence->toString();

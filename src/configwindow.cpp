@@ -91,11 +91,8 @@ void ConfigWindow::closeEvent(QCloseEvent *event) {
 }
 
 void ConfigWindow::iconActivated(QSystemTrayIcon::ActivationReason reason) {
-    switch (reason) {
-    case QSystemTrayIcon::Trigger:
+    if (reason == QSystemTrayIcon::Trigger) {
         show();
-        break;
-    default:;
     }
 }
 
