@@ -42,7 +42,7 @@ void runRegOCR(ORIENTATION orn) {
         state.setLastOCRInfo(info);
 
 #ifdef DEBUG
-        qDebug(result);
+        qDebug("%s", result);
 #endif
     }
 }
@@ -58,7 +58,7 @@ void runPrevOCR(ORIENTATION _) {
         char *result = ocr->ocrImage(imagePath, orn);
         clipboard->setText(result);
 #ifdef DEBUG
-        qDebug(result);
+        qDebug("%s", result);
 #endif
     }
 }
