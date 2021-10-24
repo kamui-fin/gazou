@@ -52,7 +52,7 @@ ConfigWindow::ConfigWindow(std::map<std::string, QHotkey *> hotkeys,
     QMenu *menu = this->createMenu();
     this->trayIcon->setContextMenu(menu);
 
-    QIcon appIcon = QIcon(":/tray.png");
+    QIcon appIcon = QIcon(":/gazou.png");
     this->trayIcon->setIcon(appIcon);
     this->setWindowIcon(appIcon);
 
