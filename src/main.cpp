@@ -6,6 +6,17 @@
 #include <vector>
 
 #include "config.h"
+#include <QApplication>
+#include <QClipboard>
+#include <QDir>
+#include <QHotkey>
+#include <QObject>
+#include <QPixmap>
+#include <map>
+#include <qdir.h>
+#include <vector>
+
+#include "config.h"
 #include "selectorwidget.h"
 #include "state.h"
 #include "utils.h"

@@ -8,6 +8,7 @@
 #include <QPushButton>
 
 #include "configwindow.h"
+#include "gui_x11.h"
 #include "keydialog.h"
 #include "utils.h"
 
@@ -52,7 +53,7 @@ ConfigWindow::ConfigWindow(std::map<std::string, QHotkey *> hotkeys,
     QMenu *menu = this->createMenu();
     this->trayIcon->setContextMenu(menu);
 
-    QIcon appIcon = QIcon(":/tray.png");
+    QIcon appIcon = QIcon(":/gazou.png");
     this->trayIcon->setIcon(appIcon);
     this->setWindowIcon(appIcon);
 

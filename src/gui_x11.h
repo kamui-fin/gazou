@@ -3,6 +3,8 @@
 #include <QHotkey>
 #include <QString>
 
+void setRegistered(std::map<std::string, QHotkey *> hotkeys, bool registered);
+
 QHotkey *setupOCRHotkey(QString sequence, void callback(ORIENTATION orn),
                         ORIENTATION orn = NONE);
 

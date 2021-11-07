@@ -24,6 +24,15 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
 
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
+
+configure_file(src/config.h.in config.h)
+include_directories(${PROJECT_BINARY_DIR})
+
+if(CMAKE_VERSION VERSION_LESS "3.7.0")
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+endif()
+
 option(GUI "Build X11 GUI support" ON)
 
 configure_file(src/config.h.in config.h)
@@ -54,6 +63,8 @@ target_link_libraries(${PROJECT_NAME} Qt5::Widgets tesseract lept)
 
 install(TARGETS gazou RUNTIME DESTINATION bin)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/models DESTINATION share/gazou)
+install(FILES resources/gazou.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
+install(FILES resources/gazou.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/pixmaps)
 
 # format entire project
 file(GLOB_RECURSE

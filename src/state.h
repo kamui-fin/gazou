@@ -1,6 +1,6 @@
+#include "ocr.h"
 #include <QObject>
 #include <QRect>
-#include "ocr.h"
 
 struct LastOCRInfo {
     ORIENTATION orn;
