@@ -48,6 +48,8 @@ target_link_libraries(${PROJECT_NAME} Qt5::Widgets qhotkey tesseract lept)
 
 install(TARGETS gazou RUNTIME DESTINATION bin)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/models DESTINATION share/gazou)
+install(FILES resources/gazou.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
+install(FILES resources/gazou.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/pixmaps)
 
 # format entire project
 file(GLOB_RECURSE

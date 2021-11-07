@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=0.20
+Name=Gazou
+GenericName=Gazou is a Japanese OCR
+Type=Application
+Comment=Gazou is a Japanese OCR
+Icon=gazou
+Exec=gazou
+Terminal=false
+Keywords=ocr;japanese;
+Categories=Office;Utility;
