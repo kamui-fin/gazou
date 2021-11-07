@@ -1,5 +1,7 @@
-#include <QString>
+#ifndef OCR_H_
+#define OCR_H_
 
+#include <QString>
 #include <leptonica/allheaders.h>
 #include <map>
 #include <tesseract/baseapi.h>
@@ -11,20 +13,22 @@ enum ORIENTATION {
 };
 
 class OCR {
-    public:
-        OCR();
-        ~OCR();
-        char *ocrImage(QString path, ORIENTATION orn);
+  public:
+    OCR();
+    ~OCR();
+    char *ocrImage(QString path, ORIENTATION orn);
 
-    private:
-        tesseract::TessBaseAPI *tess;
-        ORIENTATION orientation;
-        QString lang;
-        char *result;
-        PIX *image;
+  private:
+    tesseract::TessBaseAPI *tess;
+    ORIENTATION orientation;
+    QString lang;
+    char *result;
+    PIX *image;
 
-        PIX *processImage(QString path);
-        void extractText();
-        void setLanguage(ORIENTATION orn);
-        void setJapaneseParams();
+    PIX *processImage(QString path);
+    void extractText();
+    void setLanguage(ORIENTATION orn);
+    void setJapaneseParams();
 };
+
+#endif

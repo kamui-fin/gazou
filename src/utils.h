@@ -5,9 +5,8 @@
 
 QScreen *getActiveScreen();
 void remove_spaces(char *s);
-void setRegistered(std::map<std::string, QHotkey *> hotkeys, bool registered);
 void copyToClipboard(char *text, QClipboard *cb);
 QPixmap grabScreenshot();
-bool pathExist(const char* s);
+bool pathExist(const char *s);
 QString getTempImage(bool debugFile = false);
-const char* convertToCString(QString src);
+const char *convertToCString(QString src);

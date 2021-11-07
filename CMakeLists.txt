@@ -8,19 +8,10 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 set(Gazou_MODEL_FOLDER ${CMAKE_INSTALL_PREFIX}/share/gazou/models)
-
-if(CMAKE_VERSION VERSION_LESS "3.7.0")
-    set(CMAKE_INCLUDE_CURRENT_DIR ON)
-endif()
-
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
-
-configure_file(src/config.h.in config.h)
-include_directories(${PROJECT_BINARY_DIR})
-
-add_executable(${PROJECT_NAME} 
+set(LIBS Qt5::Widgets tesseract lept)
+set(SRC 
     src/main.cpp 
-    src/configwindow.cpp
     src/selectorwidget.cpp
     src/keydialog.cpp
     src/utils.cpp
@@ -29,7 +20,14 @@ add_executable(${PROJECT_NAME}
     resources/resources.qrc
 )
 
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
+if(CMAKE_VERSION VERSION_LESS "3.7.0")
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+endif()
+
+option(GUI "Build X11 GUI support" ON)
+
+configure_file(src/config.h.in config.h)
+include_directories(${PROJECT_BINARY_DIR})
 
 find_package(PkgConfig)
 
@@ -37,14 +35,22 @@ pkg_check_modules(TESSERACT REQUIRED tesseract>=4.0.0)
 pkg_check_modules(LEPTONICA REQUIRED lept>=1.70)
 
 find_package(Qt5Widgets REQUIRED VERSION 5.10)
-find_package(Qt5X11Extras REQUIRED)
 
-find_package(QHotkey CONFIG QUIET)
-if (NOT QHotkey_FOUND)
-    add_subdirectory(third-party/QHotkey EXCLUDE_FROM_ALL)
+if (GUI)
+    find_package(Qt5X11Extras)
+    find_package(QHotkey CONFIG QUIET)
+    if (NOT QHotkey_FOUND)
+        add_subdirectory(third-party/QHotkey EXCLUDE_FROM_ALL)
+    endif()
+    list(APPEND LIBS qhotkey)
+    list(APPEND SRC src/gui_x11.cpp
+                    src/configwindow.cpp
+    )
 endif()
 
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets qhotkey tesseract lept)
+add_executable(${PROJECT_NAME} ${SRC})
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
+target_link_libraries(${PROJECT_NAME} Qt5::Widgets tesseract lept)
 
 install(TARGETS gazou RUNTIME DESTINATION bin)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/models DESTINATION share/gazou)

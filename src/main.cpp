@@ -1,15 +1,11 @@
-#include <QApplication>
-#include <QClipboard>
 #include <QDir>
-#include <QHotkey>
 #include <QObject>
 #include <QPixmap>
+#include <iostream>
 #include <map>
-#include <qdir.h>
 #include <vector>
 
 #include "config.h"
-#include "configwindow.h"
 #include "selectorwidget.h"
 #include "state.h"
 #include "utils.h"
@@ -19,16 +15,7 @@ OCR *ocr;
 QClipboard *clipboard;
 QString imagePath = getTempImage();
 
-QHotkey *setupOCRHotkey(QString sequence, void callback(ORIENTATION orn),
-                        ORIENTATION orn = NONE) {
-    QHotkey *hotkey = new QHotkey(QKeySequence(sequence), true, qApp);
-    QObject::connect(hotkey, &QHotkey::activated, qApp,
-                     [=]() { callback(orn); });
-    return hotkey;
-}
-
 void runRegOCR(ORIENTATION orn) {
-
     if (!state.getCurrentlySelecting()) {
         state.setCurrentlySelecting(true);
         SelectorWidget sw;
@@ -63,78 +50,70 @@ void runPrevOCR(ORIENTATION _) {
     }
 }
 
+void help(char **argv) {
+    std::cout << "OCR for Japanese texts" << std::endl;
+    std::cout << "Usage:" << std::endl;
+    std::cout << "1) " << argv[0] << std::endl;
+    std::cout << "\tRun the main application" << std::endl;
+    std::cout << "2) " << argv[0] << " --help" << std::endl;
+    std::cout << "\tDisplay this message" << std::endl;
+    std::cout << "3) " << argv[0]
+              << " ORIENTATION{-h; -v; horizontal; vertical} IMAGEFILE"
+              << std::endl;
+    std::cout << "\tRun the OCR on the given IMAGEFILE with given "
+                 "ORIENTATION."
+              << std::endl;
+}
+
+int cli(int argc, char **argv) {
+    if (!std::strcmp(argv[1], "--help")) {
+        help(argv);
+        return 0;
+    }
+    if (argc > 2) {
+        char *orientation = argv[1];
+        char *img = argv[2];
+
+        ORIENTATION orn;
+
+        if (!pathExist(img)) {
+            qCritical("Invalid image path");
+            return 1;
+        }
+
+        if (!std::strcmp(orientation, "vertical") ||
+            !std::strcmp(orientation, "-v")) {
+            orn = VERTICAL;
+        } else if (!std::strcmp(orientation, "horizontal") ||
+                   !std::strcmp(orientation, "-h")) {
+            orn = HORIZONTAL;
+        } else {
+            qCritical("Invalid orientation");
+            return 1;
+        }
+
+        char *result = ocr->ocrImage(img, orn);
+        std::cout << result << std::endl;
+    } else {
+        qCritical("Invalid arguments, please use %s --help to "
+                  "see the usage",
+                  argv[0]);
+    }
+    return 0;
+}
+
 int main(int argc, char **argv) {
     ocr = new OCR();
 
     if (argc > 1) {
-        if (!std::strcmp(argv[1], "--help")) {
-            qInfo("OCR for Japanese Texts.");
-            qInfo("Usage:");
-            qInfo("1) %s", argv[0]);
-            qInfo("\t%s", "Run the main application.");
-            qInfo("2) %s %s", argv[0], "--help");
-            qInfo("\t%s", "Display this message.");
-            qInfo("3) %s %s", argv[0],
-                  "ORIENTATION{-h; -v; horizontal; vertical} "
-                  "IMAGEFILE");
-            qInfo("\tRun the OCR on the given IMAGEFILE with given "
-                  "ORIENTATION.");
-            exit(0);
-        }
-        if (argc > 2) {
-            char *orientation = argv[1];
-            char *img = argv[2];
-
-            ORIENTATION orn;
-
-            if (!pathExist(img)) {
-                qCritical("Invalid image path");
-                exit(1);
-            }
-
-            if (!std::strcmp(orientation, "vertical") ||
-                !std::strcmp(orientation, "-v")) {
-                orn = VERTICAL;
-            } else if (!std::strcmp(orientation, "horizontal") ||
-                       !std::strcmp(orientation, "-h")) {
-                orn = HORIZONTAL;
-            } else {
-                qCritical("Invalid orientation");
-                exit(1);
-            }
-
-            char *result = ocr->ocrImage(img, orn);
-            qInfo("%s", result);
-        } else {
-            qCritical("Invalid arguments, please use %s --help to "
-                      "see the usage",
-                      argv[0]);
-        }
+        return cli(argc, argv);
     } else {
-        QApplication app(argc, argv);
-        clipboard = QApplication::clipboard();
-        QSettings settings("gazou", "gazou");
-
-        QString verticalHotkey =
-            settings.value("Hotkeys/verticalOCR", "Alt+A").toString();
-        QString horizontalHotkey =
-            settings.value("Hotkeys/horizontalOCR", "Alt+D").toString();
-        QString prevOCRHotkey =
-            settings.value("Hotkeys/repeatOCR", "Alt+S").toString();
-
-        QHotkey *vKey = setupOCRHotkey(verticalHotkey, runRegOCR, VERTICAL);
-        QHotkey *hKey = setupOCRHotkey(horizontalHotkey, runRegOCR, HORIZONTAL);
-        QHotkey *prevKey = setupOCRHotkey(prevOCRHotkey, runPrevOCR);
-
-        std::map<std::string, QHotkey *> hotkeys = {{"verticalOCR", vKey},
-                                                    {"horizontalOCR", hKey},
-                                                    {"repeatOCR", prevKey}};
-
-        new ConfigWindow(hotkeys);
-
-        app.setQuitOnLastWindowClosed(false);
-        int ret = app.exec();
-        setRegistered(hotkeys, false);
-        return ret;
+#ifdef GUI
+#include "gui_x11.h"
+        return startGui(argc, argv, clipboard, runRegOCR, runPrevOCR);
+#else
+        qCritical("No GUI support was built. Re-compile with -DGUI=ON");
+        return 1;
+#endif
     }
 }

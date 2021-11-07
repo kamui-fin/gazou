@@ -1,6 +1,5 @@
 #include <QObject>
 #include <QRect>
-
 #include "ocr.h"
 
 struct LastOCRInfo {
@@ -11,16 +10,16 @@ struct LastOCRInfo {
 class State : public QObject {
     Q_OBJECT
 
-    public:
-        State();
+  public:
+    State();
 
-        bool getCurrentlySelecting();
-        void setCurrentlySelecting(bool curSel);
+    bool getCurrentlySelecting();
+    void setCurrentlySelecting(bool curSel);
 
-        LastOCRInfo getLastOCRInfo();
-        void setLastOCRInfo(LastOCRInfo inf);
+    LastOCRInfo getLastOCRInfo();
+    void setLastOCRInfo(LastOCRInfo inf);
 
-    private:
-        bool currentlySelecting;
-        LastOCRInfo lastInfo;
+  private:
+    bool currentlySelecting;
+    LastOCRInfo lastInfo;
 };

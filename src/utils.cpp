@@ -44,12 +44,6 @@ void remove_spaces(char *s) {
     } while (*s++ = *d++);
 }
 
-void setRegistered(std::map<std::string, QHotkey *> hotkeys, bool registered) {
-    for (auto const &x : hotkeys) {
-        (x.second)->setRegistered(registered);
-    }
-}
-
 void copyToClipboard(char *text, QClipboard *cb) { cb->setText(text); }
 
 QPixmap grabScreenshot() {
