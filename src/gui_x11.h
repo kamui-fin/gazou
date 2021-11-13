@@ -1,12 +1,13 @@
 #include "ocr.h"
+#include <QApplication>
 #include <QClipboard>
 #include <QHotkey>
 #include <QString>
 
 void setRegistered(std::map<std::string, QHotkey *> hotkeys, bool registered);
 
-QHotkey *setupOCRHotkey(QString sequence, void callback(ORIENTATION orn),
+QHotkey *setupOCRHotkey(QString sequence, char *callback(ORIENTATION orn),
                         ORIENTATION orn = NONE);
 
-int startGui(int argc, char **argv, QClipboard *clipboard,
-             void runRegOCR(ORIENTATION orn), void runPrevOCR(ORIENTATION orn));
+void startGui(QApplication *app, char *interactive(ORIENTATION orn),
+              char *prevOcr(ORIENTATION orn));

@@ -55,16 +55,17 @@ if (GUI)
     list(APPEND SRC src/gui_x11.cpp
                     src/configwindow.cpp
     )
+    add_compile_definitions(GUI)
 endif()
 
 add_executable(${PROJECT_NAME} ${SRC})
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets tesseract lept)
+target_link_libraries(${PROJECT_NAME} ${LIBS})
 
 install(TARGETS gazou RUNTIME DESTINATION bin)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/models DESTINATION share/gazou)
-install(FILES resources/gazou.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
-install(FILES resources/gazou.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/pixmaps)
+install(DIRECTORY models DESTINATION share/gazou)
+install(FILES resources/gazou.desktop DESTINATION share/applications)
+install(FILES resources/gazou.png DESTINATION share/pixmaps)
 
 # format entire project
 file(GLOB_RECURSE

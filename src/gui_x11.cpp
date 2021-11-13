@@ -10,19 +10,18 @@ void setRegistered(std::map<std::string, QHotkey *> hotkeys, bool registered) {
     }
 }
 
-QHotkey *setupOCRHotkey(QString sequence, void callback(ORIENTATION orn),
+QHotkey *setupOCRHotkey(QString sequence, char *callback(ORIENTATION orn),
                         ORIENTATION orn) {
     QHotkey *hotkey = new QHotkey(QKeySequence(sequence), true, qApp);
-    QObject::connect(hotkey, &QHotkey::activated, qApp,
-                     [=]() { callback(orn); });
+    QObject::connect(hotkey, &QHotkey::activated, qApp, [=]() {
+        char *text = callback(orn);
+        qApp->clipboard()->setText(text);
+    });
     return hotkey;
 }
 
-int startGui(int argc, char **argv, QClipboard *clipboard,
-             void runRegOCR(ORIENTATION orn),
-             void runPrevOCR(ORIENTATION orn)) {
-    QApplication app(argc, argv);
-    clipboard = QApplication::clipboard();
+void startGui(QApplication *app, char *interactive(ORIENTATION orn),
+              char *prevOcr(ORIENTATION orn)) {
     QSettings settings("gazou", "gazou");
 
     QString verticalHotkey =
@@ -32,17 +31,15 @@ int startGui(int argc, char **argv, QClipboard *clipboard,
     QString prevOCRHotkey =
         settings.value("Hotkeys/repeatOCR", "Alt+S").toString();
 
-    QHotkey *vKey = setupOCRHotkey(verticalHotkey, runRegOCR, VERTICAL);
-    QHotkey *hKey = setupOCRHotkey(horizontalHotkey, runRegOCR, HORIZONTAL);
-    QHotkey *prevKey = setupOCRHotkey(prevOCRHotkey, runPrevOCR);
+    QHotkey *vKey = setupOCRHotkey(verticalHotkey, interactive, VERTICAL);
+    QHotkey *hKey = setupOCRHotkey(horizontalHotkey, interactive, HORIZONTAL);
+    QHotkey *prevKey = setupOCRHotkey(prevOCRHotkey, prevOcr);
 
     std::map<std::string, QHotkey *> hotkeys = {
         {"verticalOCR", vKey}, {"horizontalOCR", hKey}, {"repeatOCR", prevKey}};
 
     new ConfigWindow(hotkeys);
 
-    app.setQuitOnLastWindowClosed(false);
-    int ret = app.exec();
-    setRegistered(hotkeys, false);
-    return ret;
+    app->setQuitOnLastWindowClosed(false);
+    setRegistered(hotkeys, true);
 }

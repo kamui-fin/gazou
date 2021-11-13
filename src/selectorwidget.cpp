@@ -10,7 +10,7 @@ SelectorWidget::SelectorWidget(QWidget *parent)
     QScreen *activeScreen = getActiveScreen();
     setAttribute(Qt::WA_TranslucentBackground);
     setWindowFlags(Qt::BypassWindowManagerHint | Qt::WindowStaysOnTopHint |
-                   Qt::FramelessWindowHint);
+                   Qt::FramelessWindowHint | Qt::WindowDoesNotAcceptFocus);
 
     desktopPixmap = grabScreenshot();
     setGeometry(activeScreen->geometry());

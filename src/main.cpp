@@ -1,64 +1,120 @@
 #include <QDir>
 #include <QObject>
 #include <QPixmap>
+#include <cstdio>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <vector>
 
-#include "config.h"
 #include <QApplication>
 #include <QClipboard>
 #include <QDir>
 #include <QHotkey>
 #include <QObject>
 #include <QPixmap>
+#include <QStandardPaths>
+#include <QTemporaryFile>
+#include <QThread>
+#include <QTimer>
 #include <map>
+#include <qchar.h>
+#include <qclipboard.h>
 #include <qdir.h>
+#include <qstandardpaths.h>
+#include <string>
 #include <vector>
 
 #include "config.h"
+#include "ocr.h"
 #include "selectorwidget.h"
 #include "state.h"
 #include "utils.h"
 
 State state;
 OCR *ocr;
-QClipboard *clipboard;
 QString imagePath = getTempImage();
+std::string stateFile =
+    QDir(QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation))
+        .absoluteFilePath("ocrcoords")
+        .toStdString();
 
-void runRegOCR(ORIENTATION orn) {
+std::vector<std::string> split(const char *phrase, std::string delimiter) {
+    std::vector<std::string> list;
+    std::string s = std::string(phrase);
+    size_t pos = 0;
+    std::string token;
+    while ((pos = s.find(delimiter)) != std::string::npos) {
+        token = s.substr(0, pos);
+        list.push_back(token);
+        s.erase(0, pos + delimiter.length());
+    }
+    list.push_back(s);
+    return list;
+}
+
+void saveLastState(QRect rect, ORIENTATION orn) {
+    std::ofstream file(stateFile);
+    file << orn << std::endl;
+    file << rect.x() << "," << rect.y() << "," << rect.width() << ","
+         << rect.height() << std::endl;
+    file.close();
+}
+
+void loadLastState() {
+    std::ifstream file(stateFile);
+    ORIENTATION orn;
+    QRect rect;
+
+    std::string tempOrn;
+    std::getline(file, tempOrn);
+    orn = static_cast<ORIENTATION>(std::stoi(tempOrn));
+
+    std::string tempRect;
+    std::string delim = ",";
+    std::getline(file, tempRect);
+    std::vector<std::string> splitted = split(tempRect.c_str(), delim);
+    rect = QRect(stoi(splitted[0]), stoi(splitted[1]), stoi(splitted[2]),
+                 stoi(splitted[3]));
+
+    LastOCRInfo info = {orn, rect};
+    state.setLastOCRInfo(info);
+}
+
+char *interactive(ORIENTATION orn) {
+    char *result = "";
     if (!state.getCurrentlySelecting()) {
         state.setCurrentlySelecting(true);
         SelectorWidget sw;
         sw.exec();
         state.setCurrentlySelecting(false);
 
-        char *result = ocr->ocrImage(imagePath, orn);
-        clipboard->setText(result);
+        result = ocr->ocrImage(imagePath, orn);
+        saveLastState(sw.lastSelectedRect, orn);
 
         LastOCRInfo info = {orn, sw.lastSelectedRect};
         state.setLastOCRInfo(info);
-
 #ifdef DEBUG
         qDebug("%s", result);
 #endif
     }
+    return result;
 }
 
-void runPrevOCR(ORIENTATION _) {
+char *prevOcr(ORIENTATION _ = ORIENTATION::NONE) {
     QPixmap desktopPixmap = grabScreenshot();
     QPixmap selectedPixmap =
         desktopPixmap.copy(state.getLastOCRInfo().rect.normalized());
     selectedPixmap.toImage().save(imagePath);
-
+    char *result = "";
     ORIENTATION orn = state.getLastOCRInfo().orn;
     if (orn != NONE) {
-        char *result = ocr->ocrImage(imagePath, orn);
-        clipboard->setText(result);
+        result = ocr->ocrImage(imagePath, orn);
 #ifdef DEBUG
         qDebug("%s", result);
 #endif
     }
+    return result;
 }
 
 void help(char **argv) {
@@ -77,53 +133,63 @@ void help(char **argv) {
 }
 
 int cli(int argc, char **argv) {
-    if (!std::strcmp(argv[1], "--help")) {
+    std::vector<std::string> args(argv + 1, argv + argc);
+    std::string first = args[0];
+
+    ORIENTATION orn;
+    char *result;
+
+    if (first == "--help") {
         help(argv);
         return 0;
+    } else if (first == "prevscan") {
+        result = prevOcr();
+        std::cout << result << std::endl;
+        return 0;
+    } else if (first == "vertical" || first == "-v") {
+        orn = VERTICAL;
+    } else if (first == "horizontal" || first == "-h") {
+        orn = HORIZONTAL;
+    } else {
+        qCritical("Invalid arguments, please use %s --help to "
+                  "see the usage",
+                  argv[0]);
+        return 1;
     }
-    if (argc > 2) {
-        char *orientation = argv[1];
-        char *img = argv[2];
 
-        ORIENTATION orn;
+    if (args.size() > 1) {
+        char *img = argv[2];
 
         if (!pathExist(img)) {
             qCritical("Invalid image path");
             return 1;
         }
 
-        if (!std::strcmp(orientation, "vertical") ||
-            !std::strcmp(orientation, "-v")) {
-            orn = VERTICAL;
-        } else if (!std::strcmp(orientation, "horizontal") ||
-                   !std::strcmp(orientation, "-h")) {
-            orn = HORIZONTAL;
-        } else {
-            qCritical("Invalid orientation");
-            return 1;
-        }
-
-        char *result = ocr->ocrImage(img, orn);
-        std::cout << result << std::endl;
+        result = ocr->ocrImage(img, orn);
     } else {
-        qCritical("Invalid arguments, please use %s --help to "
-                  "see the usage",
-                  argv[0]);
+        result = interactive(orn);
     }
+
+    std::cout << result << std::endl;
     return 0;
 }
 
 int main(int argc, char **argv) {
+    QApplication app(argc, argv);
     ocr = new OCR();
+    loadLastState();
 
     if (argc > 1) {
-        return cli(argc, argv);
+        int ret = cli(argc, argv);
+        return ret;
     } else {
 #ifdef GUI
 #include "gui_x11.h"
-        return startGui(argc, argv, clipboard, runRegOCR, runPrevOCR);
+        startGui(&app, interactive, prevOcr);
+        return app.exec();
 #else
-        qCritical("No GUI support was built. Re-compile with -DGUI=ON");
+        qCritical("No GUI support was built. Re-compile with -DGUI=ON or use "
+                  "the CLI (run with --help to view the available options)");
         return 1;
 #endif
     }
