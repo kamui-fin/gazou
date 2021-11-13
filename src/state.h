@@ -19,6 +19,9 @@ class State : public QObject {
     LastOCRInfo getLastOCRInfo();
     void setLastOCRInfo(LastOCRInfo inf);
 
+    void saveLastState(std::string outFile);
+    void loadLastState(std::string stateFile);
+
   private:
     bool currentlySelecting;
     LastOCRInfo lastInfo;

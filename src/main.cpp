@@ -34,52 +34,7 @@
 State state;
 OCR *ocr;
 QString imagePath = getTempImage();
-std::string stateFile =
-    QDir(QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation))
-        .absoluteFilePath("ocrcoords")
-        .toStdString();
-
-std::vector<std::string> split(const char *phrase, std::string delimiter) {
-    std::vector<std::string> list;
-    std::string s = std::string(phrase);
-    size_t pos = 0;
-    std::string token;
-    while ((pos = s.find(delimiter)) != std::string::npos) {
-        token = s.substr(0, pos);
-        list.push_back(token);
-        s.erase(0, pos + delimiter.length());
-    }
-    list.push_back(s);
-    return list;
-}
-
-void saveLastState(QRect rect, ORIENTATION orn) {
-    std::ofstream file(stateFile);
-    file << orn << std::endl;
-    file << rect.x() << "," << rect.y() << "," << rect.width() << ","
-         << rect.height() << std::endl;
-    file.close();
-}
-
-void loadLastState() {
-    std::ifstream file(stateFile);
-    ORIENTATION orn;
-    QRect rect;
-
-    std::string tempOrn;
-    std::getline(file, tempOrn);
-    orn = static_cast<ORIENTATION>(std::stoi(tempOrn));
-
-    std::string tempRect;
-    std::string delim = ",";
-    std::getline(file, tempRect);
-    std::vector<std::string> splitted = split(tempRect.c_str(), delim);
-    rect = QRect(stoi(splitted[0]), stoi(splitted[1]), stoi(splitted[2]),
-                 stoi(splitted[3]));
-
-    LastOCRInfo info = {orn, rect};
-    state.setLastOCRInfo(info);
-}
+std::string stateFile = getCoordsFile();
 
 char *interactive(ORIENTATION orn) {
     char *result = "";
@@ -90,10 +45,9 @@ char *interactive(ORIENTATION orn) {
         state.setCurrentlySelecting(false);
 
         result = ocr->ocrImage(imagePath, orn);
-        saveLastState(sw.lastSelectedRect, orn);
-
         LastOCRInfo info = {orn, sw.lastSelectedRect};
         state.setLastOCRInfo(info);
+        state.saveLastState(stateFile);
 #ifdef DEBUG
         qDebug("%s", result);
 #endif
@@ -124,10 +78,17 @@ void help(char **argv) {
     std::cout << "\tRun the main application" << std::endl;
     std::cout << "2) " << argv[0] << " --help" << std::endl;
     std::cout << "\tDisplay this message" << std::endl;
-    std::cout << "3) " << argv[0]
+    std::cout << "3) " << argv[0] << " prevscan" << std::endl;
+    std::cout << "\tRun the OCR on the same coordinates of the previous scan"
+              << std::endl;
+    std::cout << "4) " << argv[0]
+              << " ORIENTATION{-h; -v; horizontal; vertical}" << std::endl;
+    std::cout << "\tInteractively run the OCR and print the output to stdout"
+              << std::endl;
+    std::cout << "5) " << argv[0]
               << " ORIENTATION{-h; -v; horizontal; vertical} IMAGEFILE"
               << std::endl;
-    std::cout << "\tRun the OCR on the given IMAGEFILE with given "
+    std::cout << "\tRun the OCR on the given IMAGEFILE with the given "
                  "ORIENTATION."
               << std::endl;
 }
@@ -177,7 +138,7 @@ int cli(int argc, char **argv) {
 int main(int argc, char **argv) {
     QApplication app(argc, argv);
     ocr = new OCR();
-    loadLastState();
+    state.loadLastState(stateFile);
 
     if (argc > 1) {
         int ret = cli(argc, argv);

@@ -4,6 +4,7 @@
 #include <QHotkey>
 #include <QPainter>
 #include <QPixmap>
+#include <QStandardPaths>
 #include <qdir.h>
 #include <sys/stat.h>
 
@@ -44,8 +45,6 @@ void remove_spaces(char *s) {
     } while (*s++ = *d++);
 }
 
-void copyToClipboard(char *text, QClipboard *cb) { cb->setText(text); }
-
 QPixmap grabScreenshot() {
     QScreen *activeScreen = getActiveScreen();
     QPixmap desktopPixmap = QPixmap(activeScreen->geometry().size());
@@ -66,7 +65,27 @@ QString getTempImage(bool debugFile) {
     return QDir::temp().filePath(name);
 }
 
+std::string getCoordsFile() {
+    return QDir(QStandardPaths::writableLocation(
+                    QStandardPaths::GenericCacheLocation))
+        .absoluteFilePath("ocrcoords")
+        .toStdString();
+}
+
 const char *convertToCString(QString src) {
     QByteArray byteArray = src.toUtf8();
     return byteArray.constData();
+}
+
+std::vector<std::string> split(std::string s, std::string delimiter) {
+    std::vector<std::string> list;
+    size_t pos = 0;
+    std::string token;
+    while ((pos = s.find(delimiter)) != std::string::npos) {
+        token = s.substr(0, pos);
+        list.push_back(token);
+        s.erase(0, pos + delimiter.length());
+    }
+    list.push_back(s);
+    return list;
 }

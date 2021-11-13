@@ -31,12 +31,15 @@ paru -S gazou-git
 
 ### Dependencies
 
-These dependencies will need to be installed by your system's package manager.
+These dependencies will need to be installed by your system's package manager:
 
 - Qt5 >= 5.10
-- Qt5X11Extras >= 5.10
 - Tesseract >= 4.0.0
 - Leptonica >= 1.70
+
+Optional dependencies:
+
+- Qt5X11Extras >= 5.10 (for GUI)
 
 ### Install
 
@@ -45,13 +48,20 @@ git clone --recursive https://github.com/kamui-fin/gazou.git
 cd gazou
 mkdir build
 cd build
-cmake ..
+cmake .. -DGUI=ON
 sudo make install
 ```
 
-## Usage
+#### Wayland
 
-You can run the program by typing `gazou` in your terminal. It runs in the background and should appear in your system tray. If you click on the app in the tray, a settings dialog should appear. In here, you can customize the keybinds to your liking. The default hotkeys are:
+For wayland users, `gazou` must be compiled with `-DGUI=OFF` and use the equally functional command line interface.
+This is due to the fact that Wayland does not support applications registering their own global hotkeys as a security measure.
+
+## GUI
+
+You can run the program by typing `gazou` in your terminal. It runs in the background and should appear in your system tray.
+If you click on the app in the tray, a settings dialog should appear.
+In here, you can customize the keybinds to your liking. The default hotkeys are:
 
 - `Alt+A`: Vertical OCR
 - `Alt+D`: Horizontal OCR
@@ -59,12 +69,25 @@ You can run the program by typing `gazou` in your terminal. It runs in the backg
 
 When you perform an OCR, the result text gets copied to the clipboard.
 
-Gazou also has a command line mode, and this can be useful for integrating it with bash scripts. It takes two different parameters, the image path and the orientation, which is either `vertical (-v)` or `horizontal (-h)`. Here's an example:
+## CLI
 
-```bash
-gazou -h page103.png
+Gazou also has a command line mode, and this can be useful for integrating it with bash scripts.
+To get the resulting text copied to your clipboard, you can use `xclip`, `wl-copy`, or any clipboard utility you prefer.
+Available options include:
+
 ```
+1. gazou
+   Run the main application
 
-This command scans all the text in the image and prints the resulting text.
+2. gazou --help
+   Display this message
 
-For more help, run `gazou --help`.
+3. gazou prevscan
+   Run the OCR on the same coordinates of the previous scan
+
+4. gazou ORIENTATION{-h; -v; horizontal; vertical}
+   Interactively run the OCR and print the output to stdout
+
+5. gazou ORIENTATION{-h; -v; horizontal; vertical} IMAGEFILE
+   Run the OCR on the given IMAGEFILE with the given ORIENTATION.
+```
