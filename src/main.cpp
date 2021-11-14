@@ -1,4 +1,3 @@
-#include <QDir>
 #include <QObject>
 #include <QPixmap>
 #include <cstdio>
@@ -29,6 +28,10 @@
 #include "selectorwidget.h"
 #include "state.h"
 #include "utils.h"
+
+#ifdef GUI
+#include "gui_x11.h"
+#endif
 
 State state;
 OCR *ocr;
@@ -144,7 +147,6 @@ int main(int argc, char **argv) {
         return ret;
     } else {
 #ifdef GUI
-#include "gui_x11.h"
         startGui(&app, interactive, prevOcr);
         return app.exec();
 #else
