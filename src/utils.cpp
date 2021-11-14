@@ -1,7 +1,6 @@
 #include <QClipboard>
 #include <QCursor>
 #include <QGuiApplication>
-#include <QHotkey>
 #include <QPainter>
 #include <QPixmap>
 #include <QStandardPaths>

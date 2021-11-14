@@ -27,6 +27,10 @@ void State::saveLastState(std::string outFile) {
 
 void State::loadLastState(std::string stateFile) {
     std::ifstream file(stateFile);
+    if (!file.is_open()) {
+        return;
+    }
+
     ORIENTATION orn;
     QRect rect;
 

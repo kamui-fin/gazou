@@ -10,7 +10,6 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QDir>
-#include <QHotkey>
 #include <QObject>
 #include <QPixmap>
 #include <QStandardPaths>

@@ -1,5 +1,4 @@
 #include <QClipboard>
-#include <QHotkey>
 #include <QScreen>
 #include <map>
 
