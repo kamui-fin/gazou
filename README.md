@@ -4,20 +4,9 @@ Gazou is a Japanese OCR for Linux written in C++. It utilizes image processing, 
 
 ## Installation
 
-### Gentoo
+### Windows
 
-First, enable my gentoo overlay with `eselect-repository`. If you don't have it already, follow the [guide](https://wiki.gentoo.org/wiki/Eselect/Repository) on the Gentoo wiki first.
-
-```
-eselect repository add kamui git https://github.com/kamui-fin/gentoo-overlay.git
-emerge --sync kamui
-```
-
-Then you can emerge the package normally with:
-
-```
-emerge -av gazou
-```
+You can grab the latest portable zip build from the [releases](https://github.com/kamui-fin/gazou/releases). Simply unzip and execute `gazou.exe` and the app should run.
 
 ### Arch
 

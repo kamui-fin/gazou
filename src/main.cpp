@@ -30,7 +30,7 @@
 #include "utils.h"
 
 #ifdef GUI
-#include "gui_x11.h"
+#include "gui.h"
 #endif
 
 State state;

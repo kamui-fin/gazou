@@ -8,7 +8,7 @@
 #include <QPushButton>
 
 #include "configwindow.h"
-#include "gui_x11.h"
+#include "gui.h"
 #include "keydialog.h"
 #include "utils.h"
 

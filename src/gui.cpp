@@ -1,4 +1,4 @@
-#include "gui_x11.h"
+#include "gui.h"
 #include "configwindow.h"
 #include <QApplication>
 #include <QClipboard>
