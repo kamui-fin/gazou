@@ -12,7 +12,12 @@ SelectorWidget::SelectorWidget(QWidget *parent)
     setWindowFlags(Qt::BypassWindowManagerHint | Qt::WindowStaysOnTopHint |
                    Qt::FramelessWindowHint | Qt::WindowDoesNotAcceptFocus);
 
-    desktopPixmap = grabScreenshot();
+    bool ok = true;
+    desktopPixmap = grabScreenshot(ok);
+    if (!ok) {
+        qCritical("Unable to screenshot");
+        exit(-1);
+    }
     setGeometry(activeScreen->geometry());
     showFullScreen();
     this->setCursor(Qt::CrossCursor);

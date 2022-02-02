@@ -58,7 +58,12 @@ char *interactive(ORIENTATION orn) {
 }
 
 char *prevOcr(ORIENTATION _ = ORIENTATION::NONE) {
-    QPixmap desktopPixmap = grabScreenshot();
+    bool ok = true;
+    QPixmap desktopPixmap = grabScreenshot(ok);
+    if (!ok) {
+        qCritical("Unable to screenshot");
+        exit(-1);
+    }
     QPixmap selectedPixmap =
         desktopPixmap.copy(state.getLastOCRInfo().rect.normalized());
     selectedPixmap.toImage().save(imagePath);

@@ -13,7 +13,7 @@ else()
     set(Gazou_MODEL_FOLDER ${CMAKE_INSTALL_PREFIX}/share/gazou/models)
 endif()
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
-set(LIBS Qt5::Widgets tesseract lept)
+set(LIBS Qt5::Widgets Qt5::DBus tesseract lept)
 set(SRC 
     src/main.cpp 
     src/selectorwidget.cpp
@@ -21,6 +21,7 @@ set(SRC
     src/utils.cpp
     src/ocr.cpp
     src/state.cpp
+    src/request.cpp
     resources/resources.qrc
 )
 
@@ -47,6 +48,7 @@ find_package(PkgConfig)
 pkg_check_modules(tess REQUIRED tesseract)
 pkg_check_modules(lept REQUIRED lept)
 
+find_package(Qt5 CONFIG REQUIRED Core DBus)
 find_package(Qt5Widgets REQUIRED VERSION 5.10)
 
 if (GUI)

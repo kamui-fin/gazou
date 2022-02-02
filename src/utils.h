@@ -4,7 +4,7 @@
 
 QScreen *getActiveScreen();
 void remove_spaces(char *s);
-QPixmap grabScreenshot();
+QPixmap grabScreenshot(bool &ok);
 bool pathExist(const char *s);
 QString getTempImage(bool debugFile = false);
 std::string getCoordsFile();

@@ -1,13 +1,155 @@
+#include "utils.h"
+#include "request.h"
 #include <QClipboard>
 #include <QCursor>
+#include <QDir>
 #include <QGuiApplication>
 #include <QPainter>
 #include <QPixmap>
+#include <QProcessEnvironment>
 #include <QStandardPaths>
+#include <QUrl>
+#include <QUuid>
+#include <QtDBus/QDBusInterface>
+#include <QtDBus/QDBusReply>
 #include <qdir.h>
 #include <sys/stat.h>
 
-#include "utils.h"
+enum WM { GNOME, KDE, OTHER, SWAY };
+
+bool waylandDetected() {
+    auto e = QProcessEnvironment::systemEnvironment();
+    QString XDG_SESSION_TYPE = e.value(QStringLiteral("XDG_SESSION_TYPE"));
+    QString WAYLAND_DISPLAY = e.value(QStringLiteral("WAYLAND_DISPLAY"));
+    return XDG_SESSION_TYPE == QLatin1String("wayland") ||
+           WAYLAND_DISPLAY.contains(QLatin1String("wayland"),
+                                    Qt::CaseInsensitive);
+}
+
+WM getWM() {
+    auto e = QProcessEnvironment::systemEnvironment();
+    QString XDG_CURRENT_DESKTOP =
+        e.value(QStringLiteral("XDG_CURRENT_DESKTOP"));
+    QString KDE_FULL_SESSION = e.value(QStringLiteral("KDE_FULL_SESSION"));
+    QString GNOME_DESKTOP_SESSION_ID =
+        e.value(QStringLiteral("GNOME_DESKTOP_SESSION_ID"));
+    WM res = WM::OTHER;
+    QStringList desktops = XDG_CURRENT_DESKTOP.split(QChar(':'));
+    for (auto &desktop : desktops) {
+        if (desktop.contains(QLatin1String("GNOME"), Qt::CaseInsensitive)) {
+            return WM::GNOME;
+        }
+        if (desktop.contains(QLatin1String("sway"), Qt::CaseInsensitive)) {
+            return WM::SWAY;
+        }
+        if (desktop.contains(QLatin1String("kde-plasma"))) {
+            return WM::KDE;
+        }
+    }
+
+    if (!GNOME_DESKTOP_SESSION_ID.isEmpty()) {
+        return WM::GNOME;
+    }
+
+    if (!KDE_FULL_SESSION.isEmpty()) {
+        return WM::KDE;
+    }
+
+    return res;
+}
+
+void freeDesktopPortal(bool &ok, QPixmap &res) {
+    QDBusInterface screenshotInterface(
+        QStringLiteral("org.freedesktop.portal.Desktop"),
+        QStringLiteral("/org/freedesktop/portal/desktop"),
+        QStringLiteral("org.freedesktop.portal.Screenshot"));
+
+    // unique token
+    QString token =
+        QUuid::createUuid().toString().remove('-').remove('{').remove('}');
+
+    // premake interface
+    auto *request = new OrgFreedesktopPortalRequestInterface(
+        QStringLiteral("org.freedesktop.portal.Desktop"),
+        "/org/freedesktop/portal/desktop/request/" +
+            QDBusConnection::sessionBus().baseService().remove(':').replace(
+                '.', '_') +
+            "/" + token,
+        QDBusConnection::sessionBus());
+
+    QEventLoop loop;
+    const auto gotSignal = [&res, &loop](uint status, const QVariantMap &map) {
+        if (status == 0) {
+            // Parse this as URI to handle unicode properly
+            QUrl uri = map.value("uri").toString();
+            QString uriString = uri.toLocalFile();
+            res = QPixmap(uriString);
+            res.setDevicePixelRatio(qApp->devicePixelRatio());
+            QFile imgFile(uriString);
+            imgFile.remove();
+        }
+        loop.quit();
+    };
+
+    // prevent racy situations and listen before calling screenshot
+    QMetaObject::Connection conn = QObject::connect(
+        request, &org::freedesktop::portal::Request::Response, gotSignal);
+
+    screenshotInterface.call(
+        QStringLiteral("Screenshot"), "",
+        QMap<QString, QVariant>({{"handle_token", QVariant(token)},
+                                 {"interactive", QVariant(false)}}));
+
+    loop.exec();
+    QObject::disconnect(conn);
+    request->Close().waitForFinished();
+    request->deleteLater();
+
+    if (res.isNull()) {
+        ok = false;
+    }
+}
+
+QPixmap grabScreenshot(bool &ok) {
+    if (waylandDetected()) {
+        QPixmap res;
+        // handle screenshot based on DE
+        switch (getWM()) {
+        case WM::GNOME: {
+            freeDesktopPortal(ok, res);
+            break;
+        }
+        case WM::KDE: {
+            // https://github.com/KDE/spectacle/blob/517a7baf46a4ca0a45f32fd3f2b1b7210b180134/src/PlatformBackends/KWinWaylandImageGrabber.cpp#L145
+            QDBusInterface kwinInterface(
+                QStringLiteral("org.kde.KWin"), QStringLiteral("/Screenshot"),
+                QStringLiteral("org.kde.kwin.Screenshot"));
+            QDBusReply<QString> reply =
+                kwinInterface.call(QStringLiteral("screenshotFullscreen"));
+            res = QPixmap(reply.value());
+            if (!res.isNull()) {
+                QFile dbusResult(reply.value());
+                dbusResult.remove();
+            }
+            break;
+        }
+        case WM::SWAY: {
+            freeDesktopPortal(ok, res);
+            break;
+        }
+        default:
+            ok = false;
+            break;
+        }
+        return res;
+    } else {
+        QScreen *activeScreen = getActiveScreen();
+        QPixmap desktopPixmap = QPixmap(activeScreen->geometry().size());
+        QPainter p(&desktopPixmap);
+        p.drawPixmap(*(new QPoint(0, 0)), activeScreen->grabWindow(0));
+        return desktopPixmap;
+    }
+}
 
 QScreen *getActiveScreen() {
     QPoint globalCursorPos = QCursor::pos();
@@ -42,16 +184,6 @@ void remove_spaces(char *s) {
             newline_flag = 0;
         }
     } while (*s++ = *d++);
-}
-
-QPixmap grabScreenshot() {
-    QScreen *activeScreen = getActiveScreen();
-    QPixmap desktopPixmap = QPixmap(activeScreen->geometry().size());
-    QPainter p(&desktopPixmap);
-
-    p.drawPixmap(*(new QPoint(0, 0)), activeScreen->grabWindow(0));
-
-    return desktopPixmap;
 }
 
 bool pathExist(const char *s) {
