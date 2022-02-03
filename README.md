@@ -1,6 +1,6 @@
 # Gazou OCR
 
-Gazou is a Japanese OCR for Linux written in C++. It utilizes image processing, and other parameters to improve the accuracy. All contributions are welcome.
+Gazou is a Japanese OCR application written in C++. It utilizes image processing, and other parameters to improve the accuracy. All contributions are welcome.
 
 ## Installation
 

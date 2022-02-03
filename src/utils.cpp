@@ -115,24 +115,8 @@ QPixmap grabScreenshot(bool &ok) {
         QPixmap res;
         // handle screenshot based on DE
         switch (getWM()) {
-        case WM::GNOME: {
-            freeDesktopPortal(ok, res);
-            break;
-        }
-        case WM::KDE: {
-            // https://github.com/KDE/spectacle/blob/517a7baf46a4ca0a45f32fd3f2b1b7210b180134/src/PlatformBackends/KWinWaylandImageGrabber.cpp#L145
-            QDBusInterface kwinInterface(
-                QStringLiteral("org.kde.KWin"), QStringLiteral("/Screenshot"),
-                QStringLiteral("org.kde.kwin.Screenshot"));
-            QDBusReply<QString> reply =
-                kwinInterface.call(QStringLiteral("screenshotFullscreen"));
-            res = QPixmap(reply.value());
-            if (!res.isNull()) {
-                QFile dbusResult(reply.value());
-                dbusResult.remove();
-            }
-            break;
-        }
+        case WM::GNOME:
+        case WM::KDE:
         case WM::SWAY: {
             freeDesktopPortal(ok, res);
             break;
