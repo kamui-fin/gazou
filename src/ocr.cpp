@@ -2,6 +2,9 @@
 #include <QString>
 #include <iostream>
 #include <qdir.h>
+#include <utility>
+#include <vector>
+#include <string.h>
 
 #include "config.h"
 #include "ocr.h"
@@ -10,6 +13,7 @@
 OCR::OCR() {
     tess = new tesseract::TessBaseAPI();
     orientation = NONE;
+    corrections = {{"〈", "く"}, {"<", "く"}, {"＜", "く"}, {"L", "し"}, {"Ｌ", "し"}, {"z", "え"}, {"Z", "え"}, {"U", "じ"}, {"ー", ""}, {"一", " "}, {"―", ""}, {"‐", ""}, {"—", ""}, {"－", ""}, {"-", ""}, {"_", ""}, {"|", ""}};
 }
 
 OCR::~OCR() {
@@ -85,7 +89,7 @@ char *OCR::ocrImage(QString path, ORIENTATION orn) {
 
     image = processImage(path);
     extractText();
-    remove_spaces(result);
+    postprocess();
     return result;
 }
 
@@ -125,4 +129,60 @@ void OCR::setJapaneseParams() {
     tess->SetVariable("preserve_interword_spaces", "1");
     tess->SetVariable("user_defined_dpi", "300");
     tess->SetVariable("debug_file", "/dev/null");
+}
+
+void OCR::postprocess() {
+    char curr[5];
+    char prev[5];
+    char next[5];
+    size_t strsize = 0;
+    get_char(result, strsize, curr);
+
+    for (size_t offset = 0; offset <= strlen(result); offset += strsize) {
+        strsize = get_char(result, offset + strlen(curr), next);
+        correctCommonMistake(curr, "く", prev, next);
+        correctCommonMistake(curr, "し", prev, next);
+        correctCommonMistake(curr, "じ", prev, next);
+        correctCommonMistake(curr, "え", prev, next);
+        correctCommonMistake(curr, "、", prev, next);
+        correctCommonMistake(curr, "。", prev, next);
+
+        correctKanjiOne(curr, next);
+        correctKatakanaDash(curr, prev);
+
+        strncpy(prev, curr, 5);
+        strncpy(curr, next, 5);
+    }
+    remove_spaces(result);
+}
+
+void OCR::correctCommonMistake(char input[5], char repl[4], char prev[5],
+                               char next[5]) {
+    char* substitute = corrections[input];
+    if (substitute == NULL) {
+        return;
+    }
+    if (strcmp(substitute, repl) == 0) {
+        if ((strlen(prev) != 0 && isJapanese(prev)) ||
+            (strlen(next) != 0 && isJapanese(next))) {
+            strncpy(input, repl, 5);
+        }
+    }
+}
+
+void OCR::correctKatakanaDash(char input[5], char prev[5]) {
+    if (corrections.count(input) > 0) {
+        if (strlen(prev) != 0 && isKatakana(prev)) {
+            strncpy(input, "ー", 5);
+        }
+    }
+}
+void OCR::correctKanjiOne(char input[5], char next[5]) {
+    if (corrections.count(input) > 0) {
+        if (strlen(next) != 0) {
+            if (isKanji(next) || isHiragana(next)) {
+                strncpy(input, "一", 5);
+            }
+        }
+    }
 }

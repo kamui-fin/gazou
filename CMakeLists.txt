@@ -45,8 +45,8 @@ include_directories(${PROJECT_BINARY_DIR})
 
 find_package(PkgConfig)
 
-pkg_check_modules(tess REQUIRED tesseract)
-pkg_check_modules(lept REQUIRED lept)
+pkg_check_modules(tess REQUIRED tesseract>=4.0.0)
+pkg_check_modules(lept REQUIRED lept>=1.70)
 
 find_package(Qt5 CONFIG REQUIRED Core DBus)
 find_package(Qt5Widgets REQUIRED VERSION 5.10)

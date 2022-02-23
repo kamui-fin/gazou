@@ -79,6 +79,7 @@ char *prevOcr(ORIENTATION _ = ORIENTATION::NONE) {
 }
 
 void help(char **argv) {
+    // toggle text processing
     std::cout << "OCR for Japanese texts" << std::endl;
     std::cout << "Usage:" << std::endl;
     std::cout << "1) " << argv[0] << std::endl;

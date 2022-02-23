@@ -204,3 +204,40 @@ std::vector<std::string> split(std::string s, std::string delimiter) {
     list.push_back(s);
     return list;
 }
+
+int get_char(char *input, int offset, char buff[5]) {
+    input += offset;
+    int size = UTF8_CHAR_LEN(*input);
+    memcpy(buff, input, size);
+    buff[size] = '\0';
+    return size;
+}
+
+bool testRange(char text[5], unsigned int from, unsigned int to) {
+    int i = 0;
+    unsigned int letter = text[i];
+    while (letter != '\0') {
+        if (letter < from || letter > to) {
+            return false;
+        }
+        i += 1;
+        letter = text[i];
+    }
+    return true;
+}
+
+bool isJapanese(char text[5]) {
+    return (isKanji(text) || isHiragana(text) || isKatakana(text));
+}
+
+bool isKanji(char text[5]) {
+    return testRange(text, 0x4E00, 0x9FAF);
+}
+
+bool isHiragana(char text[5]) {
+    return testRange(text, 0x3040, 0x309F);
+}
+
+bool isKatakana(char text[5]) {
+    return testRange(text, 0x30A0, 0x30FF);
+}

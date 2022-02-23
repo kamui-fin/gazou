@@ -5,6 +5,7 @@
 #include <leptonica/allheaders.h>
 #include <map>
 #include <tesseract/baseapi.h>
+#include <vector>
 
 enum ORIENTATION {
     HORIZONTAL,
@@ -24,11 +25,18 @@ class OCR {
     QString lang;
     char *result;
     PIX *image;
+    std::map<char *, char*> corrections;
 
     PIX *processImage(QString path);
     void extractText();
     void setLanguage(ORIENTATION orn);
     void setJapaneseParams();
+    // text processing
+    void postprocess();
+    void correctCommonMistake(char input[5], char repl[4], char prev[5],
+                              char next[5]);
+    void correctKatakanaDash(char input[5], char prev[5]);
+    void correctKanjiOne(char input[5], char next[5]);
 };
 
 #endif
