@@ -14,8 +14,8 @@ else()
 endif()
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 set(LIBS Qt5::Widgets Qt5::DBus tesseract lept)
-set(SRC 
-    src/main.cpp 
+set(SRC
+    src/main.cpp
     src/selectorwidget.cpp
     src/keydialog.cpp
     src/utils.cpp

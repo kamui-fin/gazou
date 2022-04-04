@@ -65,18 +65,11 @@ To get the resulting text copied to your clipboard, you can use `xclip`, `wl-cop
 Available options include:
 
 ```
-1. gazou
-   Run the main application
+Usage: gazou [OPTIONS] [IMAGEFILE]
+   Will launch GUI if no options are given.
 
-2. gazou --help
-   Display this message
-
-3. gazou prevscan
-   Run the OCR on the same coordinates of the previous scan
-
-4. gazou ORIENTATION{-h; -v; horizontal; vertical}
-   Interactively run the OCR and print the output to stdout
-
-5. gazou ORIENTATION{-h; -v; horizontal; vertical} IMAGEFILE
-   Run the OCR on the given IMAGEFILE with the given ORIENTATION.
+   --help           Display this help menu.
+   -p, --prevscan   Run the OCR on the same coordinates of the previous scan.
+   -h, --horizontal Run horizontal OCR.
+   -v, --vertical   Run vertical OCR.
 ```

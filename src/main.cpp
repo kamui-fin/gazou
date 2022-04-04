@@ -80,25 +80,19 @@ char *prevOcr(ORIENTATION _ = ORIENTATION::NONE) {
 
 void help(char **argv) {
     // toggle text processing
-    std::cout << "OCR for Japanese texts" << std::endl;
-    std::cout << "Usage:" << std::endl;
-    std::cout << "1) " << argv[0] << std::endl;
-    std::cout << "\tRun the main application" << std::endl;
-    std::cout << "2) " << argv[0] << " --help" << std::endl;
-    std::cout << "\tDisplay this message" << std::endl;
-    std::cout << "3) " << argv[0] << " prevscan" << std::endl;
-    std::cout << "\tRun the OCR on the same coordinates of the previous scan"
+    std::cout << "Usage : gazou [OPTIONS] [IMAGEFILE]" << std::endl;
+#ifdef GUI
+    std::cout << "Will launch GUI if no options are given." << std::endl;
+#else
+    std::cout << "Built without a GUI." << std::endl;
+#endif
+    std::cout << "" << std::endl;
+    std::cout << "  --help            Display this help menu." << std::endl;
+    std::cout << "  -p, --prevscan    Run the OCR on the same coordinates of "
+                 "the previous scan."
               << std::endl;
-    std::cout << "4) " << argv[0]
-              << " ORIENTATION{-h; -v; horizontal; vertical}" << std::endl;
-    std::cout << "\tInteractively run the OCR and print the output to stdout"
-              << std::endl;
-    std::cout << "5) " << argv[0]
-              << " ORIENTATION{-h; -v; horizontal; vertical} IMAGEFILE"
-              << std::endl;
-    std::cout << "\tRun the OCR on the given IMAGEFILE with the given "
-                 "ORIENTATION."
-              << std::endl;
+    std::cout << "  -h, --horizontal  Run horizontal OCR." << std::endl;
+    std::cout << "  -v, --vertical    Run vertical OCR." << std::endl;
 }
 
 int cli(int argc, char **argv) {
@@ -111,13 +105,13 @@ int cli(int argc, char **argv) {
     if (first == "--help") {
         help(argv);
         return 0;
-    } else if (first == "prevscan") {
+    } else if (first == "--prevscan" || first == "-p") {
         result = prevOcr();
         std::cout << result << std::endl;
         return 0;
-    } else if (first == "vertical" || first == "-v") {
+    } else if (first == "--vertical" || first == "-v") {
         orn = VERTICAL;
-    } else if (first == "horizontal" || first == "-h") {
+    } else if (first == "--horizontal" || first == "-h") {
         orn = HORIZONTAL;
     } else {
         qCritical("Invalid arguments, please use %s --help to "
