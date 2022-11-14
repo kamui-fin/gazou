@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QPushButton>
+#include <unordered_map>
 
 #include "configwindow.h"
 #include "gui.h"
@@ -21,6 +22,17 @@ ConfigWindow::ConfigWindow(std::map<std::string, QHotkey *> hotkeys,
     widget = new QWidget(this);
     this->setCentralWidget(widget);
 
+
+    std::unordered_map<std::string, int> map = {{"jpn", 0}, {"chi_sim", 1}, {"chi_trad", 2}};
+
+    langChoice = new QComboBox(widget);
+    langChoice->addItem("jpn");
+    langChoice->addItem("chi_sim");
+    langChoice->addItem("chi_trad");
+
+    std::string configLang = settings->value("language", "jpn").toString().toStdString();
+    langChoice->setCurrentIndex(map[configLang]);
+
     verticalKeybindButton = new QPushButton(
         settings->value("Hotkeys/verticalOCR", "Alt+A").toString(), widget);
     horizontalKeybindButton = new QPushButton(
@@ -28,6 +40,7 @@ ConfigWindow::ConfigWindow(std::map<std::string, QHotkey *> hotkeys,
     lastOCRKeybindButton = new QPushButton(
         settings->value("Hotkeys/previousOCR", "Alt+S").toString(), widget);
 
+    langLabel = new QLabel(tr("Language"));
     verticalKeybindLabel = new QLabel(tr("Vertical OCR"));
     horizontalKeybindLabel = new QLabel(tr("Horizontal OCR"));
     lastOCRKeybindLabel = new QLabel(tr("Repeat OCR"));
@@ -41,12 +54,14 @@ ConfigWindow::ConfigWindow(std::map<std::string, QHotkey *> hotkeys,
     lastOCRKeybindButton->setObjectName("repeatOCR");
 
     QGridLayout *mainLayout = new QGridLayout(widget);
-    mainLayout->addWidget(verticalKeybindLabel, 0, 0);
-    mainLayout->addWidget(verticalKeybindButton, 0, 1);
-    mainLayout->addWidget(horizontalKeybindLabel, 1, 0);
-    mainLayout->addWidget(horizontalKeybindButton, 1, 1);
-    mainLayout->addWidget(lastOCRKeybindLabel, 2, 0);
-    mainLayout->addWidget(lastOCRKeybindButton, 2, 1);
+    mainLayout->addWidget(langLabel, 0, 0);
+    mainLayout->addWidget(langChoice, 0, 1);
+    mainLayout->addWidget(verticalKeybindLabel, 1, 0);
+    mainLayout->addWidget(verticalKeybindButton, 1, 1);
+    mainLayout->addWidget(horizontalKeybindLabel, 2, 0);
+    mainLayout->addWidget(horizontalKeybindButton, 2, 1);
+    mainLayout->addWidget(lastOCRKeybindLabel, 3, 0);
+    mainLayout->addWidget(lastOCRKeybindButton, 3, 1);
 
     setFixedSize(sizeHint());
 
@@ -59,6 +74,8 @@ ConfigWindow::ConfigWindow(std::map<std::string, QHotkey *> hotkeys,
 
     this->trayIcon->show();
 
+    connect(langChoice, SIGNAL(currentIndexChanged(const QString&)),
+        this, SLOT(onLanguageChange(const QString&)));
     connect(trayIcon, &QSystemTrayIcon::activated, this,
             &ConfigWindow::iconActivated);
     connect(verticalKeybindButton, &QPushButton::clicked, this,
@@ -67,6 +84,12 @@ ConfigWindow::ConfigWindow(std::map<std::string, QHotkey *> hotkeys,
             &ConfigWindow::handleHotkeyButton);
     connect(lastOCRKeybindButton, &QPushButton::clicked, this,
             &ConfigWindow::handleHotkeyButton);
+}
+
+void ConfigWindow::onLanguageChange(const QString& lang) {
+    QString key = "language";
+    settings->setValue("language", lang);
+    settings->sync();
 }
 
 QMenu *ConfigWindow::createMenu() {

@@ -14,6 +14,7 @@ OCR::OCR() {
     tess = new tesseract::TessBaseAPI();
     orientation = NONE;
     corrections = {{"〈", "く"}, {"<", "く"}, {"＜", "く"}, {"L", "し"}, {"Ｌ", "し"}, {"z", "え"}, {"Z", "え"}, {"U", "じ"}, {"ー", ""}, {"一", " "}, {"―", ""}, {"‐", ""}, {"—", ""}, {"－", ""}, {"-", ""}, {"_", ""}, {"|", ""}};
+    settings = new QSettings("gazou", "gazou");
 }
 
 OCR::~OCR() {
@@ -83,18 +84,19 @@ void OCR::extractText() {
 }
 
 char *OCR::ocrImage(QString path, ORIENTATION orn) {
-    if (orn != orientation) {
-        this->setLanguage(orn);
-    }
+    this->setLanguage(orn);
 
     image = processImage(path);
     extractText();
-    postprocess();
+
+    QString lang = settings->value("language", "jpn").toString();
+    if (lang == "jpn")
+        postprocess();
     return result;
 }
 
 void OCR::setLanguage(ORIENTATION orn) {
-    QString lang = "jpn";
+    QString lang = settings->value("language", "jpn").toString();
 
     if (orn == VERTICAL) {
         lang += "_vert";
@@ -103,7 +105,7 @@ void OCR::setLanguage(ORIENTATION orn) {
     tess->Init(GAZOU_MODEL_FOLDER, lang.toLocal8Bit().constData(),
                tesseract::OEM_LSTM_ONLY);
 
-    this->setJapaneseParams();
+    this->setParams();
 
     tesseract::PageSegMode pageSeg = orn == VERTICAL
                                          ? tesseract::PSM_SINGLE_BLOCK_VERT_TEXT
@@ -114,7 +116,7 @@ void OCR::setLanguage(ORIENTATION orn) {
     orientation = orn;
 }
 
-void OCR::setJapaneseParams() {
+void OCR::setParams() {
     tess->SetVariable("tessedit_char_blacklist", "}><L");
     tess->SetVariable("textord_debug_tabfind", "0");
     tess->SetVariable("language_model_ngram_on", "0");
@@ -129,6 +131,15 @@ void OCR::setJapaneseParams() {
     tess->SetVariable("preserve_interword_spaces", "1");
     tess->SetVariable("user_defined_dpi", "300");
     tess->SetVariable("debug_file", "/dev/null");
+
+    // experimental
+    tess->SetVariable("chop_enable", "T");
+    tess->SetVariable("use_new_state_cost", "F");
+    tess->SetVariable("segment_segcost_rating", "F");
+    tess->SetVariable("enable_new_segsearch", "0");
+    tess->SetVariable("language_model_ngram_on", "0");
+    tess->SetVariable("textord_force_make_prop_words", "F");
+    tess->SetVariable("edges_max_children_per_outline", "40");
 }
 
 void OCR::postprocess() {

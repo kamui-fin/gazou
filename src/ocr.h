@@ -2,6 +2,7 @@
 #define OCR_H_
 
 #include <QString>
+#include <QSettings>
 #include <leptonica/allheaders.h>
 #include <map>
 #include <tesseract/baseapi.h>
@@ -26,11 +27,12 @@ class OCR {
     char *result;
     PIX *image;
     std::map<char *, char*> corrections;
+    QSettings *settings;
 
     PIX *processImage(QString path);
     void extractText();
     void setLanguage(ORIENTATION orn);
-    void setJapaneseParams();
+    void setParams();
     // text processing
     void postprocess();
     void correctCommonMistake(char input[5], char repl[4], char prev[5],

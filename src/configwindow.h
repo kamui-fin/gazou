@@ -16,10 +16,17 @@ class ConfigWindow : public QMainWindow {
     protected:
         void closeEvent(QCloseEvent *event) override;
 
+    public slots:
+        void onLanguageChange(const QString&);
+
     private:
         std::map<std::string, QHotkey *> hotkeys;
 
         QWidget *widget;
+
+        QLabel *langLabel;
+        QComboBox *langChoice;
+
         QLabel *verticalKeybindLabel;
         QPushButton *verticalKeybindButton;
 

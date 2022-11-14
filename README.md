@@ -1,6 +1,6 @@
 # Gazou OCR
 
-Gazou is a Japanese OCR application written in C++. It utilizes image processing, and other parameters to improve the accuracy. All contributions are welcome.
+Gazou is a Japanese and Chinese OCR application written in C++. It utilizes image processing, and other parameters to improve the accuracy. All contributions are welcome.
 
 ## Installation
 
@@ -22,13 +22,13 @@ paru -S gazou-git
 
 These dependencies will need to be installed by your system's package manager:
 
-- Qt5 >= 5.10
-- Tesseract >= 4.0.0
-- Leptonica >= 1.70
+-   Qt5 >= 5.10
+-   Tesseract >= 4.0.0
+-   Leptonica >= 1.70
 
 Optional dependencies:
 
-- Qt5X11Extras >= 5.10 (for GUI)
+-   Qt5X11Extras >= 5.10 (for GUI)
 
 ### Install
 
@@ -52,9 +52,9 @@ You can run the program by typing `gazou` in your terminal. It runs in the backg
 If you click on the app in the tray, a settings dialog should appear.
 In here, you can customize the keybinds to your liking. The default hotkeys are:
 
-- `Alt+A`: Vertical OCR
-- `Alt+D`: Horizontal OCR
-- `Alt+S`: Repeat the previous OCR
+-   `Alt+A`: Vertical OCR
+-   `Alt+D`: Horizontal OCR
+-   `Alt+S`: Repeat the previous OCR
 
 When you perform an OCR, the result text gets copied to the clipboard.
 
