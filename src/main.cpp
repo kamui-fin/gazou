@@ -8,6 +8,7 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QCommandLineParser>
 #include <QDir>
 #include <QObject>
 #include <QPixmap>
@@ -95,55 +96,99 @@ void help(char **argv) {
     std::cout << "  -v, --vertical    Run vertical OCR." << std::endl;
 }
 
-int cli(int argc, char **argv) {
-    std::vector<std::string> args(argv + 1, argv + argc);
-    std::string first = args[0];
+int cli(QApplication *app) {
 
-    ORIENTATION orn;
-    char *result;
+    QCommandLineParser parser;
+#ifdef GUI
+    parser.setApplicationDescription(
+        "Launches GUI if no options are provided.");
+#else
+    parser.setApplicationDescription("Build without a GUI");
+#endif
 
-    if (first == "--help") {
-        help(argv);
-        return 0;
-    } else if (first == "--prevscan" || first == "-p") {
-        result = prevOcr();
-        std::cout << result << std::endl;
-        return 0;
-    } else if (first == "--vertical" || first == "-v") {
-        orn = VERTICAL;
-    } else if (first == "--horizontal" || first == "-h") {
-        orn = HORIZONTAL;
-    } else {
-        qCritical("Invalid arguments, please use %s --help to "
-                  "see the usage",
-                  argv[0]);
-        return 1;
+    parser.addOptions(
+        {{{"p", "prevscan"},
+          QCoreApplication::translate(
+              "main",
+              "Run the OCR on the same coordinates of the previous scan")},
+         {
+             {"l", "language"},
+             QCoreApplication::translate(
+                 "main", "Specify OCR language, defaults to jpn. "
+                         "Options: jpn, chi_sim, chi_trad"),
+             QCoreApplication::translate("main", "language"),
+         },
+         {
+             {"v", "vertical"},
+             QCoreApplication::translate(
+                 "main", "Switch orientation to vertical. Without this, gazou "
+                         "expects horizontal text."),
+         },
+         {
+             "version",
+             QCoreApplication::translate(
+                 "main", "Fetch the version information of gazou"),
+         },
+         {"help", QCoreApplication::translate("main", "View this help menu")}});
+
+    parser.addPositionalArgument(
+        "imagePath",
+        QCoreApplication::translate("main", "Source image file to OCR"));
+
+    parser.process(*app);
+
+    if (parser.isSet("help")) {
+        parser.showHelp();
+    } else if (parser.isSet("version")) {
+        parser.showVersion();
     }
 
-    if (args.size() > 1) {
-        char *img = argv[2];
+    if (parser.isSet("language")) {
+        QString lang = parser.value("l");
+        if (!(lang == "jpn" || lang == "chi_sim" || lang == "chi_trad")) {
+            qCritical("Invalid language");
+            return 1;
+        }
+        QSettings *settings = new QSettings("gazou", "gazou");
+        settings->setValue("language", lang);
+        settings->sync();
+    }
 
-        if (!pathExist(img)) {
+    if (parser.isSet("prevscan")) {
+        std::cout << prevOcr() << std::endl;
+        return 0;
+    }
+
+    ORIENTATION orn = HORIZONTAL;
+    if (parser.isSet("vertical")) {
+        orn = VERTICAL;
+    }
+
+    const QStringList posArgs = parser.positionalArguments();
+    if (posArgs.isEmpty()) {
+        std::cout << interactive(orn) << std::endl;
+    } else {
+        QString imagePath = posArgs.at(0);
+        if (!pathExist(imagePath.toStdString().c_str())) {
             qCritical("Invalid image path");
             return 1;
         }
-
-        result = ocr->ocrImage(img, orn);
-    } else {
-        result = interactive(orn);
+        std::cout << ocr->ocrImage(imagePath, orn) << std::endl;
     }
 
-    std::cout << result << std::endl;
     return 0;
 }
 
 int main(int argc, char **argv) {
     QApplication app(argc, argv);
+    QApplication::setApplicationName("gazou");
+    QApplication::setApplicationVersion("0.3.0");
+
     ocr = new OCR();
     state.loadLastState(stateFile);
 
     if (argc > 1) {
-        int ret = cli(argc, argv);
+        int ret = cli(&app);
         return ret;
     } else {
 #ifdef GUI
