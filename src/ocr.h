@@ -1,8 +1,8 @@
 #ifndef OCR_H_
 #define OCR_H_
 
-#include <QString>
 #include <QSettings>
+#include <QString>
 #include <leptonica/allheaders.h>
 #include <map>
 #include <tesseract/baseapi.h>
@@ -18,7 +18,7 @@ class OCR {
   public:
     OCR();
     ~OCR();
-    char *ocrImage(QString path, ORIENTATION orn);
+    char *ocrImage(QString path, ORIENTATION orn, bool readStdin = false);
 
   private:
     tesseract::TessBaseAPI *tess;
@@ -26,10 +26,10 @@ class OCR {
     QString lang;
     char *result;
     PIX *image;
-    std::map<char *, char*> corrections;
+    std::map<char *, char *> corrections;
     QSettings *settings;
 
-    PIX *processImage(QString path);
+    PIX *processImage(QString path, bool readStdin);
     void extractText();
     void setLanguage(ORIENTATION orn);
     void setParams();

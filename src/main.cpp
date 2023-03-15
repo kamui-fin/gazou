@@ -1,9 +1,9 @@
 #include <QObject>
 #include <QPixmap>
-#include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <unistd.h>
 #include <vector>
 
 #include <QApplication>
@@ -165,7 +165,9 @@ int cli(QApplication *app) {
     }
 
     const QStringList posArgs = parser.positionalArguments();
-    if (posArgs.isEmpty()) {
+    if (!isatty(fileno(stdin))) {
+        std::cout << ocr->ocrImage("", orn, true) << std::endl;
+    } else if (posArgs.isEmpty()) {
         std::cout << interactive(orn) << std::endl;
     } else {
         QString imagePath = posArgs.at(0);
@@ -187,7 +189,7 @@ int main(int argc, char **argv) {
     ocr = new OCR();
     state.loadLastState(stateFile);
 
-    if (argc > 1) {
+    if (argc > 1 || !isatty(fileno(stdin))) {
         int ret = cli(&app);
         return ret;
     } else {

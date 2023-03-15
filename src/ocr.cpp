@@ -2,9 +2,9 @@
 #include <QString>
 #include <iostream>
 #include <qdir.h>
+#include <string.h>
 #include <utility>
 #include <vector>
-#include <string.h>
 
 #include "config.h"
 #include "ocr.h"
@@ -13,7 +13,11 @@
 OCR::OCR() {
     tess = new tesseract::TessBaseAPI();
     orientation = NONE;
-    corrections = {{"〈", "く"}, {"<", "く"}, {"＜", "く"}, {"L", "し"}, {"Ｌ", "し"}, {"z", "え"}, {"Z", "え"}, {"U", "じ"}, {"ー", ""}, {"一", " "}, {"―", ""}, {"‐", ""}, {"—", ""}, {"－", ""}, {"-", ""}, {"_", ""}, {"|", ""}};
+    corrections = {{"〈", "く"}, {"<", "く"}, {"＜", "く"}, {"L", "し"},
+                   {"Ｌ", "し"}, {"z", "え"}, {"Z", "え"},  {"U", "じ"},
+                   {"ー", ""},   {"一", " "}, {"―", ""},    {"‐", ""},
+                   {"—", ""},    {"－", ""},  {"-", ""},    {"_", ""},
+                   {"|", ""}};
     settings = new QSettings("gazou", "gazou");
 }
 
@@ -24,7 +28,7 @@ OCR::~OCR() {
     pixDestroy(&image);
 }
 
-PIX *OCR::processImage(QString path) {
+PIX *OCR::processImage(QString path, bool readStdin) {
     float factor = 3.5f;
     const int otsuSX = 2000;
     const int otsuSY = 2000;
@@ -37,7 +41,18 @@ PIX *OCR::processImage(QString path) {
 
     QByteArray array = path.toUtf8();
     const char *imageLocation = array.constData();
-    PIX *pixs = pixRead(imageLocation);
+
+    PIX *pixs;
+    if (readStdin) {
+        std::vector<l_uint8> data;
+        std::for_each(std::istreambuf_iterator<char>(std::cin),
+                      std::istreambuf_iterator<char>(),
+                      [&data](const char c) { data.push_back(c); });
+        pixs = pixReadMem(data.data(), data.size());
+    } else {
+        pixs = pixRead(imageLocation);
+    }
+
     if (pixGetDepth(pixs) == 8) {
         // Already Grayscale so no conversion required.
         // FIXME Find a better solution for this, Couldn't find how to
@@ -83,10 +98,10 @@ void OCR::extractText() {
     result = tess->GetUTF8Text();
 }
 
-char *OCR::ocrImage(QString path, ORIENTATION orn) {
+char *OCR::ocrImage(QString path, ORIENTATION orn, bool readStdin) {
     this->setLanguage(orn);
 
-    image = processImage(path);
+    image = processImage(path, readStdin);
     extractText();
 
     QString lang = settings->value("language", "jpn").toString();
@@ -169,7 +184,7 @@ void OCR::postprocess() {
 
 void OCR::correctCommonMistake(char input[5], char repl[4], char prev[5],
                                char next[5]) {
-    char* substitute = corrections[input];
+    char *substitute = corrections[input];
     if (substitute == NULL) {
         return;
     }

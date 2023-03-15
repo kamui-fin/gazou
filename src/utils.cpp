@@ -230,14 +230,25 @@ bool isJapanese(char text[5]) {
     return (isKanji(text) || isHiragana(text) || isKatakana(text));
 }
 
-bool isKanji(char text[5]) {
-    return testRange(text, 0x4E00, 0x9FAF);
-}
+bool isKanji(char text[5]) { return testRange(text, 0x4E00, 0x9FAF); }
 
-bool isHiragana(char text[5]) {
-    return testRange(text, 0x3040, 0x309F);
-}
+bool isHiragana(char text[5]) { return testRange(text, 0x3040, 0x309F); }
 
-bool isKatakana(char text[5]) {
-    return testRange(text, 0x30A0, 0x30FF);
+bool isKatakana(char text[5]) { return testRange(text, 0x30A0, 0x30FF); }
+
+/*
+bool stdinHasData() {
+    struct pollfd fds;
+    int ret;
+    fds.fd = 0; // stdin
+    fds.events = POLLIN;
+    ret = poll(&fds, 1, 0);
+    if (ret == 1)
+        printf("Yep\n");
+    else if (ret == 0)
+        printf("No\n");
+    else
+        printf("Error\n");
+    return 0;
 }
+*/
