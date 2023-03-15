@@ -103,7 +103,7 @@ int cli(QApplication *app) {
     parser.setApplicationDescription(
         "Launches GUI if no options are provided.");
 #else
-    parser.setApplicationDescription("Build without a GUI");
+    parser.setApplicationDescription("Built without a GUI");
 #endif
 
     parser.addOptions(

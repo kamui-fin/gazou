@@ -22,13 +22,13 @@ paru -S gazou-git
 
 These dependencies will need to be installed by your system's package manager:
 
--   Qt5 >= 5.10
--   Tesseract >= 4.0.0
--   Leptonica >= 1.70
+- Qt5 >= 5.10
+- Tesseract >= 4.0.0
+- Leptonica >= 1.70
 
 Optional dependencies:
 
--   Qt5X11Extras >= 5.10 (for GUI)
+- Qt5X11Extras >= 5.10 (for GUI)
 
 ### Install
 
@@ -52,11 +52,17 @@ You can run the program by typing `gazou` in your terminal. It runs in the backg
 If you click on the app in the tray, a settings dialog should appear.
 In here, you can customize the keybinds to your liking. The default hotkeys are:
 
--   `Alt+A`: Vertical OCR
--   `Alt+D`: Horizontal OCR
--   `Alt+S`: Repeat the previous OCR
+- `Alt+A`: Vertical OCR
+- `Alt+D`: Horizontal OCR
+- `Alt+S`: Repeat the previous OCR
 
 When you perform an OCR, the result text gets copied to the clipboard.
+
+Just to clarify the language option names:
+
+- `jpn`: Japanese
+- `chi_sim`: Simplified Chinese
+- `chi_trad`: Traditional Chinese
 
 ## CLI
 
@@ -65,11 +71,27 @@ To get the resulting text copied to your clipboard, you can use `xclip`, `wl-cop
 Available options include:
 
 ```
-Usage: gazou [OPTIONS] [IMAGEFILE]
-   Will launch GUI if no options are given.
+Usage: gazou [options] imagePath
+Launches GUI if no options are provided.
 
-   --help           Display this help menu.
-   -p, --prevscan   Run the OCR on the same coordinates of the previous scan.
-   -h, --horizontal Run horizontal OCR.
-   -v, --vertical   Run vertical OCR.
+Options:
+  -p, --prevscan             Run the OCR on the same coordinates of the
+                             previous scan
+  -l, --language <language>  Specify OCR language, defaults to jpn. Options:
+                             jpn, chi_sim, chi_trad
+  -v, --vertical             Switch orientation to vertical. Without this,
+                             gazou expects horizontal text.
+  --version                  Fetch the version information of gazou
+  --help                     View this help menu
+
+Arguments:
+  imagePath                  Source image file to OCR
+```
+
+### Piping from stdin
+
+You can also run gazou by pipeing an image into the CLI:
+
+```
+cat img.png | gazou
 ```
