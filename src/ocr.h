@@ -4,6 +4,11 @@
 #include <QSettings>
 #include <QString>
 #include <leptonica/allheaders.h>
+#if (LIBLEPT_MAJOR_VERSION == 1 && LIBLEPT_MINOR_VERSION >= 83) ||             \
+    LIBLEPT_MAJOR_VERSION > 1
+#include "leptonica/array_internal.h"
+#include "leptonica/pix_internal.h"
+#endif
 #include <map>
 #include <tesseract/baseapi.h>
 #include <vector>

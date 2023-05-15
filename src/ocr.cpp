@@ -34,7 +34,7 @@ PIX *OCR::processImage(QString path, bool readStdin) {
     const int otsuSY = 2000;
     const int otsuSmoothX = 0;
     const int otsuSmoothY = 0;
-    const float otsuScorefract = 0.0f;
+    const float otsuScorefract = 0.1f;
 
     const int usmHalfwidth = 5;
     const float usmFract = 2.5f;
