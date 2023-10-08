@@ -187,14 +187,13 @@ int main(int argc, char **argv) {
     ocr = new OCR();
     state.loadLastState(stateFile);
 
-    // Create a QByteArray to store the binary data
     stdinImageData = new QByteArray();
 
-    // Read binary data from stdin
-    while (!feof(stdin)) {
+    if (!isatty(fileno(stdin))) {
         char buffer[4096];
-        size_t bytesRead = fread(buffer, 1, sizeof(buffer), stdin);
-        if (bytesRead > 0) {
+        size_t bytesRead;
+
+        while ((bytesRead = fread(buffer, 1, sizeof(buffer), stdin)) > 0) {
             stdinImageData->append(buffer, static_cast<int>(bytesRead));
         }
     }
@@ -202,14 +201,14 @@ int main(int argc, char **argv) {
     if (argc > 1 || !stdinImageData->isEmpty()) {
         QCoreApplication app(argc, argv);
         QCoreApplication::setApplicationName("gazou");
-        QCoreApplication::setApplicationVersion("0.3.1");
+        QCoreApplication::setApplicationVersion("0.3.2");
         int ret = cli(&app, stdinImageData);
         return ret;
     } else {
 #ifdef GUI
         QApplication app(argc, argv);
         QApplication::setApplicationName("gazou");
-        QApplication::setApplicationVersion("0.3.1");
+        QApplication::setApplicationVersion("0.3.2");
         startGui(&app, interactive, prevOcr);
         return app.exec();
 #else

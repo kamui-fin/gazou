@@ -43,12 +43,15 @@ PIX *OCR::processImage(QString path, QByteArray *stdinImageData) {
     const char *imageLocation = array.constData();
 
     PIX *pixs;
-    if (!stdinImageData->isEmpty()) {
+    if (path != "") {
+        pixs = pixRead(imageLocation);
+    } else if (!stdinImageData->isEmpty()) {
         std::vector<l_uint8> data;
         pixs = pixReadMem((unsigned char *)stdinImageData->data(),
                           stdinImageData->size());
     } else {
-        pixs = pixRead(imageLocation);
+        qCritical("CRITICAL: No piped image or supplied image path.");
+        return NULL;
     }
 
     if (pixGetDepth(pixs) == 8) {
