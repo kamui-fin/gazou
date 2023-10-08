@@ -22,15 +22,16 @@ ConfigWindow::ConfigWindow(std::map<std::string, QHotkey *> hotkeys,
     widget = new QWidget(this);
     this->setCentralWidget(widget);
 
-
-    std::unordered_map<std::string, int> map = {{"jpn", 0}, {"chi_sim", 1}, {"chi_trad", 2}};
+    std::unordered_map<std::string, int> map = {
+        {"jpn", 0}, {"chi_sim", 1}, {"chi_trad", 2}};
 
     langChoice = new QComboBox(widget);
     langChoice->addItem("jpn");
     langChoice->addItem("chi_sim");
     langChoice->addItem("chi_trad");
 
-    std::string configLang = settings->value("language", "jpn").toString().toStdString();
+    std::string configLang =
+        settings->value("language", "jpn").toString().toStdString();
     langChoice->setCurrentIndex(map[configLang]);
 
     verticalKeybindButton = new QPushButton(
@@ -74,8 +75,8 @@ ConfigWindow::ConfigWindow(std::map<std::string, QHotkey *> hotkeys,
 
     this->trayIcon->show();
 
-    connect(langChoice, SIGNAL(currentIndexChanged(const QString&)),
-        this, SLOT(onLanguageChange(const QString&)));
+    connect(langChoice, SIGNAL(currentIndexChanged(const QString &)), this,
+            SLOT(onLanguageChange(const QString &)));
     connect(trayIcon, &QSystemTrayIcon::activated, this,
             &ConfigWindow::iconActivated);
     connect(verticalKeybindButton, &QPushButton::clicked, this,
@@ -86,7 +87,7 @@ ConfigWindow::ConfigWindow(std::map<std::string, QHotkey *> hotkeys,
             &ConfigWindow::handleHotkeyButton);
 }
 
-void ConfigWindow::onLanguageChange(const QString& lang) {
+void ConfigWindow::onLanguageChange(const QString &lang) {
     QString key = "language";
     settings->setValue("language", lang);
     settings->sync();
@@ -96,8 +97,13 @@ QMenu *ConfigWindow::createMenu() {
     QAction *quitAction = new QAction("&Quit", this);
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
 
+    QAction *configureAction = new QAction("&Configure", this);
+    connect(configureAction, &QAction::triggered, qApp,
+            [this]() { this->show(); });
+
     QMenu *menu = new QMenu(this);
     menu->addAction(quitAction);
+    menu->addAction(configureAction);
 
     return menu;
 }
