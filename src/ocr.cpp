@@ -28,7 +28,7 @@ OCR::~OCR() {
     pixDestroy(&image);
 }
 
-PIX *OCR::processImage(QString path, bool readStdin) {
+PIX *OCR::processImage(QString path, QByteArray *stdinImageData) {
     float factor = 3.5f;
     const int otsuSX = 2000;
     const int otsuSY = 2000;
@@ -43,12 +43,10 @@ PIX *OCR::processImage(QString path, bool readStdin) {
     const char *imageLocation = array.constData();
 
     PIX *pixs;
-    if (readStdin) {
+    if (!stdinImageData->isEmpty()) {
         std::vector<l_uint8> data;
-        std::for_each(std::istreambuf_iterator<char>(std::cin),
-                      std::istreambuf_iterator<char>(),
-                      [&data](const char c) { data.push_back(c); });
-        pixs = pixReadMem(data.data(), data.size());
+        pixs = pixReadMem((unsigned char *)stdinImageData->data(),
+                          stdinImageData->size());
     } else {
         pixs = pixRead(imageLocation);
     }
@@ -98,10 +96,10 @@ void OCR::extractText() {
     result = tess->GetUTF8Text();
 }
 
-char *OCR::ocrImage(QString path, ORIENTATION orn, bool readStdin) {
+char *OCR::ocrImage(QString path, ORIENTATION orn, QByteArray *stdinImageData) {
     this->setLanguage(orn);
 
-    image = processImage(path, readStdin);
+    image = processImage(path, stdinImageData);
     extractText();
 
     QString lang = settings->value("language", "jpn").toString();

@@ -23,7 +23,7 @@ class OCR {
   public:
     OCR();
     ~OCR();
-    char *ocrImage(QString path, ORIENTATION orn, bool readStdin = false);
+    char *ocrImage(QString path, ORIENTATION orn, QByteArray *stdinImageData);
 
   private:
     tesseract::TessBaseAPI *tess;
@@ -34,7 +34,7 @@ class OCR {
     std::map<char *, char *> corrections;
     QSettings *settings;
 
-    PIX *processImage(QString path, bool readStdin);
+    PIX *processImage(QString path, QByteArray *stdinImageData);
     void extractText();
     void setLanguage(ORIENTATION orn);
     void setParams();

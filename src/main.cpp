@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <qdebug.h>
 #include <unistd.h>
 #include <vector>
 
@@ -34,6 +35,7 @@
 #include "gui.h"
 #endif
 
+QByteArray *stdinImageData;
 State state;
 OCR *ocr;
 QString imagePath = getTempImage();
@@ -47,7 +49,7 @@ char *interactive(ORIENTATION orn) {
         sw.exec();
         state.setCurrentlySelecting(false);
 
-        result = ocr->ocrImage(imagePath, orn);
+        result = ocr->ocrImage(imagePath, orn, stdinImageData);
         LastOCRInfo info = {orn, sw.lastSelectedRect};
         state.setLastOCRInfo(info);
         state.saveLastState(stateFile);
@@ -71,7 +73,7 @@ char *prevOcr(ORIENTATION _ = ORIENTATION::NONE) {
     char *result = "";
     ORIENTATION orn = state.getLastOCRInfo().orn;
     if (orn != NONE) {
-        result = ocr->ocrImage(imagePath, orn);
+        result = ocr->ocrImage(imagePath, orn, stdinImageData);
 #ifdef DEBUG
         qDebug("%s", result);
 #endif
@@ -96,7 +98,7 @@ void help(char **argv) {
     std::cout << "  -v, --vertical    Run vertical OCR." << std::endl;
 }
 
-int cli(QApplication *app) {
+int cli(QCoreApplication *app, QByteArray *stdinImageData) {
 
     QCommandLineParser parser;
 #ifdef GUI
@@ -165,8 +167,8 @@ int cli(QApplication *app) {
     }
 
     const QStringList posArgs = parser.positionalArguments();
-    if (!isatty(fileno(stdin))) {
-        std::cout << ocr->ocrImage("", orn, true) << std::endl;
+    if (!stdinImageData->isEmpty()) {
+        std::cout << ocr->ocrImage("", orn, stdinImageData) << std::endl;
     } else if (posArgs.isEmpty()) {
         std::cout << interactive(orn) << std::endl;
     } else {
@@ -175,25 +177,39 @@ int cli(QApplication *app) {
             qCritical("Invalid image path");
             return 1;
         }
-        std::cout << ocr->ocrImage(imagePath, orn) << std::endl;
+        std::cout << ocr->ocrImage(imagePath, orn, stdinImageData) << std::endl;
     }
 
     return 0;
 }
 
 int main(int argc, char **argv) {
-    QApplication app(argc, argv);
-    QApplication::setApplicationName("gazou");
-    QApplication::setApplicationVersion("0.3.0");
-
     ocr = new OCR();
     state.loadLastState(stateFile);
 
-    if (argc > 1 || !isatty(fileno(stdin))) {
-        int ret = cli(&app);
+    // Create a QByteArray to store the binary data
+    stdinImageData = new QByteArray();
+
+    // Read binary data from stdin
+    while (!feof(stdin)) {
+        char buffer[4096];
+        size_t bytesRead = fread(buffer, 1, sizeof(buffer), stdin);
+        if (bytesRead > 0) {
+            stdinImageData->append(buffer, static_cast<int>(bytesRead));
+        }
+    }
+
+    if (argc > 1 || !stdinImageData->isEmpty()) {
+        QCoreApplication app(argc, argv);
+        QCoreApplication::setApplicationName("gazou");
+        QCoreApplication::setApplicationVersion("0.3.1");
+        int ret = cli(&app, stdinImageData);
         return ret;
     } else {
 #ifdef GUI
+        QApplication app(argc, argv);
+        QApplication::setApplicationName("gazou");
+        QApplication::setApplicationVersion("0.3.1");
         startGui(&app, interactive, prevOcr);
         return app.exec();
 #else

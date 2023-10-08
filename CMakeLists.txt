@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20..3.50)
 
-project(gazou VERSION 0.2.0 LANGUAGES CXX)
+project(gazou VERSION 0.3.1 LANGUAGES CXX)
 set (CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_AUTOMOC ON)
