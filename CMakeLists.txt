@@ -13,7 +13,14 @@ else()
     set(Gazou_MODEL_FOLDER ${CMAKE_INSTALL_PREFIX}/share/gazou/models)
 endif()
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
-set(LIBS Qt5::Widgets Qt5::DBus tesseract leptonica)
+set(LIBS Qt5::Widgets Qt5::DBus tesseract)
+
+if (UNIX)
+    list(APPEND LIBS leptonica)
+else()
+    list(APPEND LIBS lept)
+endif()
+    
 set(SRC
     src/main.cpp
     src/selectorwidget.cpp

@@ -189,14 +189,17 @@ int main(int argc, char **argv) {
 
     stdinImageData = new QByteArray();
 
-    if (!isatty(fileno(stdin))) {
-        char buffer[4096];
-        size_t bytesRead;
+    #ifdef Q_OS_LINUX
+        if (!isatty(fileno(stdin))) {
+            std::cout << "Reading from stdin" << std::endl;
+            char buffer[4096];
+            size_t bytesRead;
 
-        while ((bytesRead = fread(buffer, 1, sizeof(buffer), stdin)) > 0) {
-            stdinImageData->append(buffer, static_cast<int>(bytesRead));
+            while ((bytesRead = fread(buffer, 1, sizeof(buffer), stdin)) > 0) {
+                stdinImageData->append(buffer, static_cast<int>(bytesRead));
+            }
         }
-    }
+    #endif
 
     if (argc > 1 || !stdinImageData->isEmpty()) {
         QCoreApplication app(argc, argv);

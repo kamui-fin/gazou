@@ -17,6 +17,10 @@ SelectorWidget::SelectorWidget(QWidget *parent)
     if (!ok) {
         qCritical("Unable to screenshot");
         exit(-1);
+    } else {
+        QFile file(getTempImage());
+        file.open(QIODevice::WriteOnly);
+        desktopPixmap.save(&file, "PNG");
     }
     setGeometry(activeScreen->geometry());
     showFullScreen();
